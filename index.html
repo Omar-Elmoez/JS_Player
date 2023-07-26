@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Music Player</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css"
+      integrity="sha512-ZnR2wlLbSbr8/c9AgLg3jQPAattCUImNsae6NHYnS9KrIwRdcY9DxFotXhNAKIKbAXlRnujIqUWoXXwqyFOeIQ=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="player">
+      <div class="player__side-menu">
+        <h1>Playlist</h1>
+        <div class="player__play-list">
+          <div class="player__play-list_item">
+            <span></span>
+            <i class="bi bi-music-note-beamed music-icon"></i>
+            play list
+          </div>
+          <div class="player__play-list_item">
+            <span></span>
+            <i class="bi bi-music-note-beamed music-icon"></i>
+            last listening
+          </div>
+          <div class="player__play-list_item">
+            <span></span>
+            <i class="bi bi-music-note-beamed music-icon"></i>
+            recommended
+          </div>
+        </div>
+      </div>
+      <div class="player__main-menu"></div>
+      <div class="player__master-play"></div>
+    </div>
+    <script src="main.js"></script>
+  </body>
+</html>
