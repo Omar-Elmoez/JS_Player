@@ -260,17 +260,18 @@ body {
 .player__btns button.active {
   background-color: #5adae0;
 }
-.player__popular-songs {
+.player__popular-songs,
+.player__popular-artists  {
   width: 90%;
   margin: 25px auto 0;
   /* border: 1px solid #fff; */
 }
-.popular-songs__header {
+.popular__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
-.popular-songs__arrows i {
+.popular__arrows i {
   color: #808080;
   cursor: pointer;
   transition: 0.3s;
@@ -279,17 +280,21 @@ body {
   -ms-transition: 0.3s;
   -o-transition: 0.3s;
 }
-.popular-songs__arrows i:hover {
+.popular__arrows i:hover {
   color: #fff;
 }
-.popular-songs__posters {
+.popular__posters {
   margin-top: 15px;
-  border: 1px solid #fff;
-  display: flex;
+  /*border: 1px solid #fff;
+  */display: flex;
   gap: 15px;
   overflow: auto;
+  scroll-behavior: smooth;
 }
-.popular-songs__posters-item {
+.popular__posters::-webkit-scrollbar {
+  display: none;
+} 
+.popular__posters-item {
   min-width: 100px;
   transition: .3s;
   -webkit-transition: .3s;
@@ -297,7 +302,7 @@ body {
   -ms-transition: .3s;
   -o-transition: .3s;
 }
-.popular-songs__posters-item:hover {
+.popular__posters-item:hover {
   background-color: rgba(105, 105, 170, 0.1);
 }
 .img-play {
@@ -306,7 +311,7 @@ body {
   justify-content: center;
   align-items: center;
 }
-.img-play img {
+.popular__posters img {
   max-width: 100%;
 }
 .img-play i {
@@ -322,18 +327,27 @@ body {
 .img-play:hover i {
   opacity: 1;
 }
-.popular-songs__posters-item h5,
-.popular-songs__posters-item p {
+.popular__posters-item h5,
+.popular__posters-item p {
   text-transform: capitalize;
   padding-left: 5px;
 }
-.popular-songs__posters-item h5 {
+.popular__posters-item h5 {
   margin-top: 5px;
   font-size: .8rem;
 }
-.popular-songs__posters-item p {
+.popular__posters-item p {
   font-size: 0.7rem;
   color: #4c5262;
+}
+.player__popular-artists {
+  margin-top: 15px;
+}
+.popular__posters .artist-item {
+  height: 60px;
+  min-width: 60px;
+  border-radius: 50%;
+  overflow: hidden;
 }
 /* ============================== Style Master_Play ============================== */
 .player__master-play {
