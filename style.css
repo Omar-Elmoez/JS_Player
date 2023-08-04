@@ -4,6 +4,9 @@
   padding: 0;
   box-sizing: border-box;
 }
+:root {
+  --moveFromLeft: '-4px';
+}
 body {
   font-family: "Poppins", sans-serif;
   height: 100vh;
@@ -426,26 +429,33 @@ body {
   color: #fff;
   font-size: 20px;
 }
-.player__master-play .starting_time {
+.player__master-play .starting_time, 
+.player__master-play .Ending_time {
+  min-width: 50px;
+  text-align: center;
   font-size: 11px;
   color: #fff;
-  margin-left: 20px;
 }
 .player__bar {
   background: rgba(105, 105, 170, 0.1);
   cursor: pointer;
 }
 .player__progressBar {
-  width: 1%;
+  width: 0;
   height: 1px;
   background-color: #36e2ec;
   position: relative;
+  transition: width .2s;
+  -webkit-transition: width .2s;
+  -moz-transition: width .2s;
+  -ms-transition: width .2s;
+  -o-transition: width .2s;
 }
 .player__progressBar::before {
   content: "";
   position: absolute;
   top: -4px;
-  left: -4px;
+  left: var(--moveFromLeft);
   width: 8px;
   height: 8px;
   border-radius: 50%;
@@ -457,7 +467,6 @@ body {
 }
 .player__song-bar {
   width: 50%;
-  margin-left: 15px;
 }
 .player__volume-bar {
   flex: 1;
