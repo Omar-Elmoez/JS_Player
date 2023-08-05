@@ -7,12 +7,15 @@ let masterPlayHeading = document.querySelector(
 let masterPlaySubtitle = document.querySelector(
   ".player__master-play .subtitle"
 );
+let songBar = document.querySelector(".player__song-bar");
+let volumeBar = document.querySelector(".player__volume-bar");
 let songStartingTime = document.querySelector(".starting_time");
 let songEndingTime = document.querySelector(".Ending_time");
-let progressBar = document.querySelector(".player__progressBar");
-let songBar = document.querySelector(".player__song-bar");
+let songProgressBar = document.querySelector(".song-progressBar");
+let volumeProgressBar = document.querySelector(".volume-progressBar");
+let volumeIcon = document.querySelector(".player__volume");
 
-let current;
+let current, clickedPosition;
 
 const avalibleSongs = Array.from(document.querySelectorAll(".player__item"));
 avalibleSongs.forEach((song) => {
@@ -109,25 +112,53 @@ function setEndingTime() {
   // with out (|| 0) it will evaluate NaN every time you switch the song
   songEndingTime.innerText = `${allMinutes || 0}:${allSeconds || 0}`;
 }
-function updateProgressBar() {
+function updateSongProgressBar() {
   let passedTime = parseInt((music.currentTime / music.duration) * 100);
-  progressBar.style.width = `${passedTime}%`;
+  songProgressBar.style.width = `${passedTime}%`;
+  document.documentElement.style.setProperty("--moveFromLeft", "100%");
+}
+function moveProgressBarWhenClicking(e, bar) {
+  clickedPosition = e.clientX - e.target.offsetLeft;
+  if (clickedPosition > bar.parentElement.offsetWidth) return;
+  bar.style.width = `${clickedPosition}px`;
   document.documentElement.style.setProperty("--moveFromLeft", "100%");
 }
 // ============================== Activate Timing ==============================
 music.addEventListener("timeupdate", () => {
   setStartingTime();
   setEndingTime();
-  updateProgressBar();
+  updateSongProgressBar();
 });
 songBar.addEventListener("click", (e) => {
-  let clickedPosition = e.clientX - e.target.offsetLeft;
-  progressBar.style.width = `${clickedPosition}px`;
-  document.documentElement.style.setProperty("--moveFromLeft", "100%");
-  // 545 => this is the maximum value that clickedPosition can have.
-  // you get this when you click at the end of the progress bar.
-  music.currentTime = clickedPosition / 545 * music.duration;
-  console.log(music.currentTime);
+  moveProgressBarWhenClicking(e, songProgressBar);
+  // songProgressBar.parentElement.offsetWidth => to get the width of its parent, because this is
+  // the avalible for it to move.
+  music.currentTime =
+    (clickedPosition / songProgressBar.parentElement.offsetWidth) *
+    music.duration;
+});
+// ============================== Activate Sound ==============================
+volumeBar.addEventListener("click", (e) => {
+  moveProgressBarWhenClicking(e, volumeProgressBar);
+  // the range of music.volume => [0,1]
+  music.volume = clickedPosition / 100 > 1 ? 1 : clickedPosition / 100;
+  volumeIcon.classList.replace("bi-volume-mute-fill", "bi-volume-down-fill");
+  volumeIcon.classList.replace("bi-volume-up-fill", "bi-volume-down-fill");
+});
+volumeIcon.addEventListener("click", () => {
+  if (
+    volumeIcon.classList.contains("bi-volume-up-fill") ||
+    volumeIcon.classList.contains("bi-volume-down-fill")
+  ) {
+    volumeIcon.classList.replace("bi-volume-up-fill", "bi-volume-mute-fill");
+    volumeIcon.classList.replace("bi-volume-down-fill", "bi-volume-mute-fill");
+    volumeProgressBar.style.width = 0;
+    music.volume = 0;
+  } else {
+      volumeIcon.classList.replace("bi-volume-mute-fill", "bi-volume-up-fill");
+      volumeProgressBar.style.width = `100%`;
+      music.volume = 1;
+  }
 });
 // ============================== Activate Arrows ==============================
 const arrows = Array.from(document.querySelectorAll(".popular__arrows"));

@@ -442,7 +442,7 @@ body {
 }
 .player__progressBar {
   width: 0;
-  height: 1px;
+  height: 2px;
   background-color: #36e2ec;
   position: relative;
   transition: width .2s;
@@ -454,7 +454,7 @@ body {
 .player__progressBar::before {
   content: "";
   position: absolute;
-  top: -4px;
+  top: -3px;
   left: var(--moveFromLeft);
   width: 8px;
   height: 8px;
@@ -464,6 +464,12 @@ body {
   -ms-border-radius: 50%;
   -o-border-radius: 50%;
   background-color: #36e2ec;
+}
+.volume-progressBar {
+  width: 100%;
+}
+.volume-progressBar::before {
+  left: 100%;
 }
 .player__song-bar {
   width: 50%;
