@@ -1,5 +1,7 @@
-let music = new Audio("audio/2.mp3");
+let music = new Audio("audio/12.mp3");
 let startPlayingIcon = document.querySelector(".start-playing-icon");
+let backIcon = document.querySelector('.back-icon');
+let nextIcon = document.querySelector('.next-icon');
 let masterPlayImg = document.querySelector(".player__master-play img");
 let masterPlayHeading = document.querySelector(
   ".player__master-play .song-name"
@@ -7,6 +9,10 @@ let masterPlayHeading = document.querySelector(
 let masterPlaySubtitle = document.querySelector(
   ".player__master-play .subtitle"
 );
+
+// because we set a default song => this will make it dynamic if you want to change the default song
+let current = parseInt(music.src.match(/\d{2}.mp3/g)[0]), clickedPosition;
+
 let songBar = document.querySelector(".player__song-bar");
 let volumeBar = document.querySelector(".player__volume-bar");
 let songStartingTime = document.querySelector(".starting_time");
@@ -14,8 +20,6 @@ let songEndingTime = document.querySelector(".Ending_time");
 let songProgressBar = document.querySelector(".song-progressBar");
 let volumeProgressBar = document.querySelector(".volume-progressBar");
 let volumeIcon = document.querySelector(".player__volume");
-
-let current, clickedPosition;
 
 const avalibleSongs = Array.from(document.querySelectorAll(".player__item"));
 avalibleSongs.forEach((song) => {
@@ -65,10 +69,11 @@ startPlayingIcon.addEventListener("click", () => {
     startPlayingIcon.classList.replace("bi-play-fill", "bi-pause-fill");
     startWaving();
     avalibleSongs.forEach((item) => {
-      if (item.dataset.id === current) {
+      if (+item.dataset.id === current) {
         item
           .querySelector(".play-icon")
           .classList.replace("bi-play-circle-fill", "bi-pause-circle-fill");
+        item.style.border = "2px solid #36e2ec";
       }
     });
   } else {
@@ -82,7 +87,42 @@ startPlayingIcon.addEventListener("click", () => {
     stopWaving();
   }
 });
-
+backIcon.addEventListener('click', () => {
+  let current_playing_id = parseInt(music.src.match(/\d+.mp3/g)[0]);
+  avalibleSongs.forEach(song => {
+    if(+song.dataset.id === current_playing_id - 1) {
+      song.style.border = "2px solid #36e2ec";
+      song
+      .querySelector(".play-icon")
+      .classList.replace("bi-play-circle-fill", "bi-pause-circle-fill");
+    } else {
+      song.style.border = 'none';
+      song
+        .querySelector(".play-icon")
+        .classList.replace("bi-pause-circle-fill", "bi-play-circle-fill");
+    }
+  })
+  music.src = `audio/${ current_playing_id - 1}.mp3`;
+  music.play();
+})
+nextIcon.addEventListener('click', () => {
+  let current_playing_id = parseInt(music.src.match(/\d+.mp3/g)[0]);
+  avalibleSongs.forEach(song => {
+    if(+song.dataset.id === current_playing_id + 1) {
+      song.style.border = "2px solid #36e2ec";
+      song
+      .querySelector(".play-icon")
+      .classList.replace("bi-play-circle-fill", "bi-pause-circle-fill");
+    } else {
+      song.style.border = 'none';
+      song
+        .querySelector(".play-icon")
+        .classList.replace("bi-pause-circle-fill", "bi-play-circle-fill");
+    }
+  })
+  music.src = `audio/${ current_playing_id + 1}.mp3`;
+  music.play();
+})
 function startWaving() {
   document.querySelectorAll(".wave span").forEach((item) => {
     item.style.cssText = `
