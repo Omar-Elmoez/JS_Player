@@ -1,7 +1,7 @@
 let music = new Audio("audio/12.mp3");
 let startPlayingIcon = document.querySelector(".start-playing-icon");
-let backIcon = document.querySelector('.back-icon');
-let nextIcon = document.querySelector('.next-icon');
+let backIcon = document.querySelector(".back-icon");
+let nextIcon = document.querySelector(".next-icon");
 let masterPlayImg = document.querySelector(".player__master-play img");
 let masterPlayHeading = document.querySelector(
   ".player__master-play .song-name"
@@ -11,7 +11,8 @@ let masterPlaySubtitle = document.querySelector(
 );
 
 // because we set a default song => this will make it dynamic if you want to change the default song
-let current = parseInt(music.src.match(/\d{2}.mp3/g)[0]), clickedPosition;
+let current = parseInt(music.src.match(/\d{2}.mp3/g)[0]),
+  clickedPosition;
 
 let songBar = document.querySelector(".player__song-bar");
 let volumeBar = document.querySelector(".player__volume-bar");
@@ -55,10 +56,7 @@ avalibleSongs.forEach((song) => {
         .classList.replace("bi-pause-circle-fill", "bi-play-circle-fill");
       stopWaving();
     }
-
-    masterPlayImg.src = song.querySelector("img").src;
-    masterPlayHeading.innerText = song.querySelector("h5").innerText;
-    masterPlaySubtitle.innerText = song.querySelector("p").innerText;
+    setMasterPlayInfo(current);
   });
 });
 
@@ -87,42 +85,44 @@ startPlayingIcon.addEventListener("click", () => {
     stopWaving();
   }
 });
-backIcon.addEventListener('click', () => {
+backIcon.addEventListener("click", () => {
   let current_playing_id = parseInt(music.src.match(/\d+.mp3/g)[0]);
-  avalibleSongs.forEach(song => {
-    if(+song.dataset.id === current_playing_id - 1) {
+  avalibleSongs.forEach((song) => {
+    if (+song.dataset.id === current_playing_id - 1) {
       song.style.border = "2px solid #36e2ec";
       song
-      .querySelector(".play-icon")
-      .classList.replace("bi-play-circle-fill", "bi-pause-circle-fill");
+        .querySelector(".play-icon")
+        .classList.replace("bi-play-circle-fill", "bi-pause-circle-fill");
     } else {
-      song.style.border = 'none';
+      song.style.border = "none";
       song
         .querySelector(".play-icon")
         .classList.replace("bi-pause-circle-fill", "bi-play-circle-fill");
     }
-  })
-  music.src = `audio/${ current_playing_id - 1}.mp3`;
+  });
+  music.src = `audio/${current_playing_id - 1}.mp3`;
   music.play();
-})
-nextIcon.addEventListener('click', () => {
+  setMasterPlayInfo(current_playing_id - 1);
+});
+nextIcon.addEventListener("click", () => {
   let current_playing_id = parseInt(music.src.match(/\d+.mp3/g)[0]);
-  avalibleSongs.forEach(song => {
-    if(+song.dataset.id === current_playing_id + 1) {
+  avalibleSongs.forEach((song) => {
+    if (+song.dataset.id === current_playing_id + 1) {
       song.style.border = "2px solid #36e2ec";
       song
-      .querySelector(".play-icon")
-      .classList.replace("bi-play-circle-fill", "bi-pause-circle-fill");
+        .querySelector(".play-icon")
+        .classList.replace("bi-play-circle-fill", "bi-pause-circle-fill");
     } else {
-      song.style.border = 'none';
+      song.style.border = "none";
       song
         .querySelector(".play-icon")
         .classList.replace("bi-pause-circle-fill", "bi-play-circle-fill");
     }
-  })
-  music.src = `audio/${ current_playing_id + 1}.mp3`;
+  });
+  music.src = `audio/${current_playing_id + 1}.mp3`;
   music.play();
-})
+  setMasterPlayInfo(current_playing_id + 1);
+});
 function startWaving() {
   document.querySelectorAll(".wave span").forEach((item) => {
     item.style.cssText = `
@@ -163,6 +163,16 @@ function moveProgressBarWhenClicking(e, bar) {
   bar.style.width = `${clickedPosition}px`;
   document.documentElement.style.setProperty("--moveFromLeft", "100%");
 }
+function setMasterPlayInfo(current) {
+  masterPlayImg.src = `imgs/${current}.jpg`;
+  avalibleSongs.forEach((song) => {
+    if (+song.dataset.id === +current) {
+      masterPlayHeading.innerText = song.querySelector("h5").innerText;
+      masterPlaySubtitle.innerText = song.querySelector("p").innerText;
+    }
+  });
+}
+setMasterPlayInfo(current);
 // ============================== Activate Timing ==============================
 music.addEventListener("timeupdate", () => {
   setStartingTime();
@@ -195,9 +205,9 @@ volumeIcon.addEventListener("click", () => {
     volumeProgressBar.style.width = 0;
     music.volume = 0;
   } else {
-      volumeIcon.classList.replace("bi-volume-mute-fill", "bi-volume-up-fill");
-      volumeProgressBar.style.width = `100%`;
-      music.volume = 1;
+    volumeIcon.classList.replace("bi-volume-mute-fill", "bi-volume-up-fill");
+    volumeProgressBar.style.width = `100%`;
+    music.volume = 1;
   }
 });
 // ============================== Activate Arrows ==============================
