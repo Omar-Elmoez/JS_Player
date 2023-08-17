@@ -2,6 +2,8 @@ let music = new Audio("audio/12.mp3");
 let startPlayingIcon = document.querySelector(".start-playing-icon");
 let backIcon = document.querySelector(".back-icon");
 let nextIcon = document.querySelector(".next-icon");
+let downloadIcon = document.querySelector("#download_icon");
+downloadIcon.href = music.src;
 let masterPlayImg = document.querySelector(".player__master-play img");
 let masterPlayHeading = document.querySelector(
   ".player__master-play .song-name"
@@ -9,10 +11,12 @@ let masterPlayHeading = document.querySelector(
 let masterPlaySubtitle = document.querySelector(
   ".player__master-play .subtitle"
 );
+let moodIcon = document.querySelector(".icons .mood_icon");
 
 // because we set a default song => this will make it dynamic if you want to change the default song
-let current = parseInt(music.src.match(/\d{2}.mp3/g)[0]),
-  clickedPosition;
+let current = parseInt(music.src.match(/\d{2}.mp3/g)),
+  clickedPosition,
+  mood = "next_song";
 
 let songBar = document.querySelector(".player__song-bar");
 let volumeBar = document.querySelector(".player__volume-bar");
@@ -27,19 +31,15 @@ avalibleSongs.forEach((song) => {
   song.querySelector("img").src = `imgs/${song.dataset.id}.jpg`;
 
   song.addEventListener("click", () => {
-    avalibleSongs.forEach((item) => {
-      item.style.border = "none";
-      item
-        .querySelector(".play-icon")
-        .classList.replace("bi-pause-circle-fill", "bi-play-circle-fill");
-    });
+    setDefaultStylesForSongs();
 
     song.style.border = "2px solid #36e2ec";
 
-    current = song.dataset.id;
-    let current_id = new RegExp(`${current}.mp3`, "g");
-    if (!current_id.test(music.src)) {
-      music.src = `audio/${song.dataset.id}.mp3`;
+    let song_id = song.dataset.id;
+    if (+song_id !== current) {
+      current = +song_id;
+      music.src = `audio/${song_id}.mp3`;
+      downloadIcon.href = music.src;
     }
     if (music.paused || music.currentTime === 0) {
       music.play();
@@ -56,7 +56,7 @@ avalibleSongs.forEach((song) => {
         .classList.replace("bi-pause-circle-fill", "bi-play-circle-fill");
       stopWaving();
     }
-    setMasterPlayInfo(current);
+    setMasterPlayInfo(song_id);
   });
 });
 
@@ -86,7 +86,7 @@ startPlayingIcon.addEventListener("click", () => {
   }
 });
 backIcon.addEventListener("click", () => {
-  let current_playing_id = parseInt(music.src.match(/\d+.mp3/g)[0]);
+  let current_playing_id = parseInt(music.src.match(/\d+.mp3/g));
   avalibleSongs.forEach((song) => {
     if (+song.dataset.id === current_playing_id - 1) {
       song.style.border = "2px solid #36e2ec";
@@ -101,11 +101,12 @@ backIcon.addEventListener("click", () => {
     }
   });
   music.src = `audio/${current_playing_id - 1}.mp3`;
+  downloadIcon.href = music.src;
   music.play();
   setMasterPlayInfo(current_playing_id - 1);
 });
 nextIcon.addEventListener("click", () => {
-  let current_playing_id = parseInt(music.src.match(/\d+.mp3/g)[0]);
+  let current_playing_id = parseInt(music.src.match(/\d+.mp3/g));
   avalibleSongs.forEach((song) => {
     if (+song.dataset.id === current_playing_id + 1) {
       song.style.border = "2px solid #36e2ec";
@@ -120,6 +121,7 @@ nextIcon.addEventListener("click", () => {
     }
   });
   music.src = `audio/${current_playing_id + 1}.mp3`;
+  downloadIcon.href = music.src;
   music.play();
   setMasterPlayInfo(current_playing_id + 1);
 });
@@ -173,12 +175,21 @@ function setMasterPlayInfo(current) {
   });
 }
 setMasterPlayInfo(current);
+function setDefaultStylesForSongs() {
+  avalibleSongs.forEach((item) => {
+    item.style.border = "none";
+    item
+      .querySelector(".play-icon")
+      .classList.replace("bi-pause-circle-fill", "bi-play-circle-fill");
+  });
+}
 // ============================== Activate Timing ==============================
 music.addEventListener("timeupdate", () => {
   setStartingTime();
   setEndingTime();
   updateSongProgressBar();
 });
+
 songBar.addEventListener("click", (e) => {
   moveProgressBarWhenClicking(e, songProgressBar);
   // songProgressBar.parentElement.offsetWidth => to get the width of its parent, because this is
@@ -226,3 +237,44 @@ for (let i = 0; i < arrows.length; i++) {
     }
   });
 }
+// ============================== Changing Mood ==============================
+moodIcon.addEventListener("click", () => {
+  switch (mood) {
+    case "next_song":
+      mood = "repeat_song";
+      moodIcon.classList.replace('bi-music-note-beamed', 'bi-arrow-repeat');
+      break;
+
+    case "repeat_song":
+      mood = "shuffle";
+      moodIcon.classList.replace('bi-arrow-repeat', 'bi-shuffle');
+      break;
+
+    default:
+      mood = "next_song";
+      moodIcon.classList.replace('bi-shuffle', 'bi-music-note-beamed');
+  }
+});
+
+music.addEventListener('ended', () => {
+  if(mood === 'next_song') {
+    nextIcon.click();
+  } else if (mood === 'repeat_song') {
+    music.play();
+  } else {
+    let randomNum = Math.floor(Math.random() * 19);
+    music.src = `audio/${randomNum}.mp3`;
+    music.play();
+    setMasterPlayInfo(randomNum + 1);
+    console.log(music.src);
+    setDefaultStylesForSongs();
+    avalibleSongs.forEach(item => {
+      if(+item.dataset.id === randomNum + 1) {
+        item.style.border = "2px solid #36e2ec";
+        item
+        .querySelector(".play-icon")
+        .classList.replace("bi-play-circle-fill", "bi-pause-circle-fill");
+      }
+    })
+  }
+})
