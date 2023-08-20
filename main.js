@@ -27,40 +27,17 @@ let volumeProgressBar = document.querySelector(".volume-progressBar");
 let volumeIcon = document.querySelector(".player__volume");
 
 const avalibleSongs = Array.from(document.querySelectorAll(".player__item"));
-avalibleSongs.forEach((song) => {
-  song.querySelector("img").src = `imgs/${song.dataset.id}.jpg`;
-
-  song.addEventListener("click", () => {
-    setDefaultStylesForSongs();
-
-    song.style.border = "2px solid #36e2ec";
-
-    let song_id = song.dataset.id;
-    if (+song_id !== current) {
-      current = +song_id;
-      music.src = `audio/${song_id}.mp3`;
-      downloadIcon.href = music.src;
-    }
-    if (music.paused || music.currentTime === 0) {
-      music.play();
-      startPlayingIcon.classList.replace("bi-play-fill", "bi-pause-fill");
-      song
-        .querySelector(".play-icon")
-        .classList.replace("bi-play-circle-fill", "bi-pause-circle-fill");
-      startWaving();
-    } else {
-      music.pause();
-      startPlayingIcon.classList.replace("bi-pause-fill", "bi-play-fill");
-      song
-        .querySelector(".play-icon")
-        .classList.replace("bi-pause-circle-fill", "bi-play-circle-fill");
-      stopWaving();
-    }
-    setMasterPlayInfo(song_id);
+avalibleSongs.forEach((item) => {
+  item.addEventListener("click", () => {
+    searchBox.value = "";
+    resultBox.innerHTML = "";
   });
 });
+startPlayingMusic(avalibleSongs);
 
 startPlayingIcon.addEventListener("click", () => {
+  searchBox.value = '';
+  resultBox.innerHTML = '';
   if (music.src === "") return;
   if (music.paused || music.currentTime === 0) {
     music.play();
@@ -69,8 +46,8 @@ startPlayingIcon.addEventListener("click", () => {
     avalibleSongs.forEach((item) => {
       if (+item.dataset.id === current) {
         item
-          .querySelector(".play-icon")
-          .classList.replace("bi-play-circle-fill", "bi-pause-circle-fill");
+        .querySelector(".play-icon")
+        .classList.replace("bi-play-circle-fill", "bi-pause-circle-fill");
         item.style.border = "2px solid #36e2ec";
       }
     });
@@ -79,8 +56,8 @@ startPlayingIcon.addEventListener("click", () => {
     startPlayingIcon.classList.replace("bi-pause-fill", "bi-play-fill");
     avalibleSongs.forEach((item) => {
       item
-        .querySelector(".play-icon")
-        .classList.replace("bi-pause-circle-fill", "bi-play-circle-fill");
+      .querySelector(".play-icon")
+      .classList.replace("bi-pause-circle-fill", "bi-play-circle-fill");
     });
     stopWaving();
   }
@@ -125,6 +102,39 @@ nextIcon.addEventListener("click", () => {
   music.play();
   setMasterPlayInfo(current_playing_id + 1);
 });
+function startPlayingMusic(arr) {
+  arr.forEach((song) => {
+    song.querySelector("img").src = `imgs/${song.dataset.id}.jpg`;
+
+    song.addEventListener("click", () => {
+      setDefaultStylesForSongs(arr);
+      song.style.border = "2px solid #36e2ec";
+
+      let song_id = song.dataset.id;
+      if (+song_id !== current) {
+        current = +song_id;
+        music.src = `audio/${song_id}.mp3`;
+        downloadIcon.href = music.src;
+      }
+      if (music.paused || music.currentTime === 0) {
+        music.play();
+        startPlayingIcon.classList.replace("bi-play-fill", "bi-pause-fill");
+        song
+          .querySelector(".play-icon")
+          .classList.replace("bi-play-circle-fill", "bi-pause-circle-fill");
+        startWaving();
+      } else {
+        music.pause();
+        startPlayingIcon.classList.replace("bi-pause-fill", "bi-play-fill");
+        song
+          .querySelector(".play-icon")
+          .classList.replace("bi-pause-circle-fill", "bi-play-circle-fill");
+        stopWaving();
+      }
+      setMasterPlayInfo(song_id);
+    });
+  });
+}
 function startWaving() {
   document.querySelectorAll(".wave span").forEach((item) => {
     item.style.cssText = `
@@ -175,8 +185,8 @@ function setMasterPlayInfo(current) {
   });
 }
 setMasterPlayInfo(current);
-function setDefaultStylesForSongs() {
-  avalibleSongs.forEach((item) => {
+function setDefaultStylesForSongs(arr) {
+  arr.forEach((item) => {
     item.style.border = "none";
     item
       .querySelector(".play-icon")
@@ -242,39 +252,94 @@ moodIcon.addEventListener("click", () => {
   switch (mood) {
     case "next_song":
       mood = "repeat_song";
-      moodIcon.classList.replace('bi-music-note-beamed', 'bi-arrow-repeat');
+      moodIcon.classList.replace("bi-music-note-beamed", "bi-arrow-repeat");
       break;
 
     case "repeat_song":
       mood = "shuffle";
-      moodIcon.classList.replace('bi-arrow-repeat', 'bi-shuffle');
+      moodIcon.classList.replace("bi-arrow-repeat", "bi-shuffle");
       break;
 
     default:
       mood = "next_song";
-      moodIcon.classList.replace('bi-shuffle', 'bi-music-note-beamed');
+      moodIcon.classList.replace("bi-shuffle", "bi-music-note-beamed");
   }
 });
 
-music.addEventListener('ended', () => {
-  if(mood === 'next_song') {
+music.addEventListener("ended", () => {
+  if (mood === "next_song") {
     nextIcon.click();
-  } else if (mood === 'repeat_song') {
+  } else if (mood === "repeat_song") {
     music.play();
   } else {
     let randomNum = Math.floor(Math.random() * 19);
-    music.src = `audio/${randomNum}.mp3`;
+    // we add 1 to randomNum because, we start our dataset.id from 1 and randomNum could be 0 also adding 1 make it
+    // possible to get 19;
+    current = randomNum + 1;
+    music.src = `audio/${randomNum + 1}.mp3`;
     music.play();
     setMasterPlayInfo(randomNum + 1);
     console.log(music.src);
     setDefaultStylesForSongs();
-    avalibleSongs.forEach(item => {
-      if(+item.dataset.id === randomNum + 1) {
+    avalibleSongs.forEach((item) => {
+      if (+item.dataset.id === randomNum + 1) {
         item.style.border = "2px solid #36e2ec";
         item
-        .querySelector(".play-icon")
-        .classList.replace("bi-play-circle-fill", "bi-pause-circle-fill");
+          .querySelector(".play-icon")
+          .classList.replace("bi-play-circle-fill", "bi-pause-circle-fill");
       }
-    })
+    });
   }
-})
+});
+
+// ============================== Activate Search Box ==============================
+let searchBox = document.getElementById("search-box");
+let resultBox = document.querySelector(".player__search-results");
+const allSongsNames = avalibleSongs.map(
+  (item) => item.querySelector("h5").innerText.toLowerCase()
+);
+// with event (change) it executes after hitting -Enter-
+// when writing a capital letter using (shift + letter) this means to events so the code below will trigger twice
+searchBox.addEventListener("keyup", (e) => {
+  resultBox.innerHTML = "";
+  
+  // !e.shiftKey => To not trigger the event with shift key
+  if (searchBox.value !== "" && !e.shiftKey) {
+    const searchedValuesIndexes = allSongsNames
+      .map((item, index) => {
+        if (item.includes(searchBox.value.toLowerCase())) {
+          return index;
+        }
+      })
+      .filter((item) => item !== undefined);
+
+    const wantedSongs = avalibleSongs.filter((item) =>
+      searchedValuesIndexes.includes(+item.dataset.id - 1)
+    );
+
+    wantedSongs.forEach((ele) => {
+      let resultItem = `
+        <div class="player__songs-item searched-song" data-id=${ele.dataset.id}>
+          ${ele.querySelector("img").outerHTML}
+          <div>
+            ${ele.querySelector("h5").outerHTML}
+            <p class="subtitle">${ele.querySelector("p").innerText}</p>
+          </div>
+          ${ele.querySelector("i").outerHTML}
+        </div>`;
+
+      resultBox.innerHTML += resultItem;
+    });
+    const searchedSongs = Array.from(
+      document.querySelectorAll(".searched-song")
+    );
+    startPlayingMusic(searchedSongs);
+    searchedSongs.forEach((item) => {
+      item.addEventListener("click", () => {
+        avalibleSongs.forEach((item) => (item.style.border = "none"));
+      });
+    });
+  } else {
+    resultBox.innerHTML = "";
+  }
+});
