@@ -116,16 +116,20 @@ body {
   font-size: 0.75rem;
   font-weight: 600;
   color: #4c5262;
-  margin-right: 20px;
+  width: 35px;
 }
 .player__songs-item img {
   width: 35px;
-  height: 35px;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  -ms-border-radius: 50%;
+  -o-border-radius: 50%;
 }
 .player__songs-item > div {
   flex-grow: 1;
   margin-left: 15px;
-  /* text-transform: capitalize; */
 }
 .player__songs-item .song-name {
   font-size: 0.75rem;
@@ -133,7 +137,7 @@ body {
 }
 .player__songs-item .subtitle {
   font-size: 0.6rem;
-  color: #4c5262;
+  color: #d3d9e9;
 }
 .player__songs-item .play-icon {
   font-size: 1rem;
@@ -145,13 +149,15 @@ body {
   background-color: #0b1320;
   position: relative;
   z-index: 2;
+  background-image: url("/imgs/bg.jpg");
+  background-position: center;
+  background-size: cover;
 }
 .player__main-menu::before {
   content: "";
   position: absolute;
-  width: 100%;
-  height: 300px;
-  background-image: url("/imgs/bg.png");
+  inset: 0;
+  background-color: rgba(105, 105, 170, 0.3);
   z-index: -1;
 }
 .player__main-nav {
@@ -181,9 +187,7 @@ body {
   letter-spacing: 1.5px;
   font-size: 0.8rem;
 }
-.player__main-list li:hover {
-  color: #fff;
-}
+.player__main-list li:hover,
 .player__main-list li.active {
   color: #fff;
 }
@@ -208,6 +212,7 @@ body {
   -o-border-radius: 20px;
   padding-inline: 10px;
   position: relative;
+  border: 2px solid;
 }
 .player__search i,
 .player__search input::placeholder {
@@ -265,7 +270,7 @@ body {
 }
 .player__main-content p {
   font-size: 0.8rem;
-  color: #626775;
+  color: #d3d9e9;
   letter-spacing: 1.3px;
 }
 .player__btns {
@@ -293,7 +298,7 @@ body {
 .player__popular-artists  {
   width: 90%;
   margin: 25px auto 0;
-  /* border: 1px solid #fff; */
+  position: relative;
 }
 .popular__header {
   display: flex;
@@ -301,7 +306,7 @@ body {
   justify-content: space-between;
 }
 .popular__arrows i {
-  color: #808080;
+  color: #d3d9e9;
   cursor: pointer;
   transition: 0.3s;
   -webkit-transition: 0.3s;
@@ -311,14 +316,25 @@ body {
 }
 .popular__arrows i:hover {
   color: #fff;
+  cursor: pointer;
 }
 .popular__posters {
   margin-top: 15px;
-  /*border: 1px solid #fff;
-  */display: flex;
+  display: flex;
   gap: 15px;
   overflow: auto;
   scroll-behavior: smooth;
+  position: relative;
+}
+.coming-soon::before {
+  content: 'Coming Soon....';
+  position: absolute;
+  inset: 0;
+  backdrop-filter: blur(15px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  letter-spacing: 2px;
 }
 .popular__posters::-webkit-scrollbar {
   display: none;
@@ -326,9 +342,7 @@ body {
 .popular__posters-item {
   min-width: 100px;
   cursor: pointer;
-}
-.popular__posters-item:hover {
-  background-color: rgba(105, 105, 170, 0.1);
+  text-align: center;
 }
 .img-play {
   position: relative;
@@ -338,6 +352,8 @@ body {
 }
 .popular__posters img {
   max-width: 100%;
+  padding: 1px;
+  background-color: #fff;
 }
 .img-play i {
   position: absolute;
@@ -348,12 +364,11 @@ body {
   -ms-transition: .3s;
   -o-transition: .3s;
 }
-.img-play:hover i {
+.popular__posters-item:hover i {
   opacity: 1;
 }
 .popular__posters-item h5,
 .popular__posters-item p {
-  /* text-transform: capitalize; */
   padding-left: 5px;
 }
 .popular__posters-item h5 {
@@ -362,10 +377,11 @@ body {
 }
 .popular__posters-item p {
   font-size: 0.7rem;
-  color: #4c5262;
+  color: #d3d9e9;
 }
 .player__popular-artists {
   margin-top: 15px;
+
 }
 .popular__posters .artist-item {
   height: 60px;
@@ -445,7 +461,7 @@ body {
   font-size: 0.75rem;
   letter-spacing: 2px;
 }
-.player__master-play .subtitle {
+.master-play__subtitle {
   font-size: 0.6rem;
   color: #4c5262;
 }
@@ -462,7 +478,7 @@ body {
 }
 .player__master-play .starting_time, 
 .player__master-play .Ending_time {
-  min-width: 50px;
+  min-width: 60px;
   text-align: center;
   font-size: 11px;
   color: #fff;
