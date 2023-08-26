@@ -189,7 +189,7 @@ body {
   gap: 25px;
 }
 .player__main-list li {
-  color: #4c5262;
+  color: #fff;
   text-transform: uppercase;
   transition: 0.3s;
   -webkit-transition: 0.3s;
@@ -201,10 +201,7 @@ body {
   letter-spacing: 1.5px;
   font-size: 0.8rem;
 }
-.player__main-list li:hover,
-.player__main-list li.active {
-  color: #fff;
-}
+.player__main-list li:hover::before,
 .player__main-list li.active::before {
   content: "";
   position: absolute;
