@@ -1,5 +1,6 @@
-let music = new Audio("audio/12.mp3");
+let music = new Audio("audio/Mariam.mp3");
 let startPlayingIcon = document.querySelector(".start-playing-icon");
+let btn = document.querySelector(".player__btns button");
 let backIcon = document.querySelector(".back-icon");
 let nextIcon = document.querySelector(".next-icon");
 let downloadIcon = document.querySelector("#download_icon");
@@ -7,15 +8,99 @@ let masterPlayImg = document.querySelector(".player__master-play img");
 let masterPlayHeading = document.querySelector(
   ".player__master-play .song-name"
 );
-const allSubtitles = Array.from(
-  document.querySelectorAll('.subtitle')
+const playListItems = Array.from(
+  document.querySelectorAll(".player__play-list_item")
 );
+let sideSurahsBox = document.querySelector(".player__songs-list");
+let mainSurahsBox = document.querySelector(".popular__posters");
 let moodIcon = document.querySelector(".icons .mood_icon");
-let mainHeading = document.querySelector('.player__main-content h1');
+let mainHeading = document.querySelector(".player__main-content h1");
 // because we set a default song => this will make it dynamic if you want to change the default song
-let current = parseInt(music.src.match(/\d{2}.mp3/g)),
+let current = music.src.match(/\w+-?\w+.mp3/g)[0],
   clickedPosition,
   mood = "next_song";
+const surahsNames = [
+  "Al-Fateha",
+  "Al-Bakara",
+  "Al-Emran",
+  "Al-Nesaa",
+  "Al-Maeda",
+  "Al-Anaam",
+  "Al-Aaraf",
+  "Al-Anfal",
+  "Al-Tawba",
+  "Younos",
+  "Hood",
+  "Yusuf",
+  "Al-Raad",
+  "Ibrahim",
+  "Al-Hejr",
+  "Al-Nahl",
+  "Al-Esraa",
+  "Al-Kahf",
+  "Mariam",
+  "Taha",
+  "Al-Anbiaa",
+  "Al-Haj",
+  "Al-Moamenon",
+  "Al-Nour",
+  "Al-Forkan",
+  "Al-Shoaraa",
+  "Al-Naml",
+  "Al-Kasas",
+  "Al-Ankabot",
+  "Al-Rom",
+  "Lokman",
+];
+createSurahsElements();
+const avalibleSongs = Array.from(document.querySelectorAll(".player__item"));
+const allSubtitles = Array.from(document.querySelectorAll(".subtitle"));
+avalibleSongs.forEach((item) => {
+  item.addEventListener("click", () => {
+    setDefaultStylesForSongs(avalibleSongs);
+    playMusic(item);
+  });
+});
+// ============================== set Data Names And Durations ==============================
+function setDataNamesAndDurations() {
+  avalibleSongs.forEach((item) => {
+    let item_id = item.querySelector("h5").innerText;
+    item.setAttribute("data-name", `${item_id}.mp3`);
+    let relatedAudio = new Audio(`audio/${item.dataset.name}`);
+    relatedAudio.addEventListener("durationchange", () => {
+      let itemDuration = relatedAudio.duration;
+      item.setAttribute("data-duration", itemDuration);
+    });
+  });
+}
+function setSubtitlesInfo() {
+  avalibleSongs.forEach((item) => {
+    item.querySelector(".subtitle").innerText = setHoursAndMiuntesAndSeconds(
+      item.dataset.duration
+    );
+  });
+}
+setDataNamesAndDurations();
+setTimeout(() => {
+  setSubtitlesInfo();
+}, 3000);
+// ============================== Player Play List ==============================
+playListItems.forEach((item) => {
+  item.addEventListener("click", () => {
+    playListItems.forEach((ele) => ele.classList.remove("active"));
+    item.classList.add("active");
+    if (item.innerText === "Loved Surahs") {
+      setDefaultStylesForSongs(avalibleSongs);
+      createLovedSurahsElements();
+    } else {
+      showAllSurahs();
+    }
+  });
+});
+
+const allSongsNames = avalibleSongs.map(
+  (item) => item.querySelector("h5").innerText
+);
 
 let songBar = document.querySelector(".player__song-bar");
 let volumeBar = document.querySelector(".player__volume-bar");
@@ -24,132 +109,225 @@ let songEndingTime = document.querySelector(".Ending_time");
 let songProgressBar = document.querySelector(".song-progressBar");
 let volumeProgressBar = document.querySelector(".volume-progressBar");
 let volumeIcon = document.querySelector(".player__volume");
-
-const avalibleSongs = Array.from(document.querySelectorAll(".player__item"));
-avalibleSongs.forEach((item) => {
-  item.addEventListener("click", () => {
-    searchBox.value = "";
-    resultBox.innerHTML = "";
+// ============================== Create Songs Elements ==============================
+function setHoursAndMiuntesAndSeconds(time) {
+  let allMinutesAvalible = parseInt(+time / 60);
+  let musicHours = parseInt(allMinutesAvalible / 60);
+  let musicMiuntes = parseInt(allMinutesAvalible % 60);
+  let musicSeconds = parseInt(+time % 60);
+  if (musicHours < 10) musicHours = `0${musicHours}`;
+  if (musicMiuntes < 10) musicMiuntes = `0${musicMiuntes}`;
+  if (musicSeconds < 10) musicSeconds = `0${musicSeconds}`;
+  // with out (|| 0) it will evaluate NaN every time you switch the song
+  return `${musicHours || 0}:${musicMiuntes || 0}:${musicSeconds || 0}`;
+}
+function createSurahsElements() {
+  surahsNames.forEach((surah, index) => {
+    if (index < 15) {
+      let surahElement = `
+        <li class="player__songs-item player__item">
+          <span>${index + 1}</span>
+          <img src="imgs/poster.jpg" alt="album" />
+          <div>
+            <h5 class="song-name">${surah}</h5>
+            <p class="subtitle"></p>
+          </div>
+          <i class="bi bi-play-circle-fill play-icon unique-icon"></i>
+        </li>
+        `;
+      sideSurahsBox.innerHTML += surahElement;
+    } else {
+      let surahElement = `
+        <div class="popular__posters-item player__item">
+          <div class="img-play">
+            <img src="imgs/poster.jpg" alt="poster" />
+            <i class="bi bi-play-circle-fill play-icon"></i>
+          </div>
+          <div>
+            <h5>${surah}</h5>
+            <p class="subtitle"></p>
+          </div>
+        </div>
+        `;
+      mainSurahsBox.innerHTML += surahElement;
+    }
   });
-});
+}
+function createLovedSurahsElements() {
+  sideSurahsBox.innerHTML = "";
+  avalibleSongs.map((item, index) => {
+    if (item.classList.contains("loved")) {
+      let spanElement = item.querySelector("span")
+        ? ""
+        : `<span>${index}</span>`;
+      sideSurahsBox.innerHTML += ` 
+        <li class="player__songs-item player__item loved-song">
+          ${spanElement}
+          ${item.innerHTML}
+        </li>
+      `;
+    }
+  });
+  const lovedSurahs = Array.from(document.querySelectorAll(".loved-song"));
+  lovedSurahs.forEach((item) => {
+    item.addEventListener("click", () => {
+      setDefaultStylesForSongs(lovedSurahs);
+      item.setAttribute(
+        "data-name",
+        `${item.querySelector("h5").innerText}.mp3`
+      );
+    });
+    playMusic(item);
+  });
+}
+function showAllSurahs() {
+  sideSurahsBox.innerHTML = "";
+  avalibleSongs.map((item, index) => {
+    if (index < 15) {
+      sideSurahsBox.appendChild(item);
+    } else {
+      mainSurahsBox.appendChild(item);
+    }
+  });
+}
+setDownloadInfo();
 // ============================== Set All Subtitles Info ==============================
-allSubtitles.forEach(item => {
-  let relatedMusicIndex = item.parentElement.parentElement.dataset.id;
-
-  let relatedAudio = new Audio(`audio/${relatedMusicIndex}.mp3`);
-  relatedAudio.addEventListener('durationchange', () => {
-    let duration = relatedAudio.duration;
-    setTiming(duration, item)
-  })
-
-
-})
-startPlayingMusic(avalibleSongs);
 
 startPlayingIcon.addEventListener("click", () => {
-  searchBox.value = '';
-  resultBox.innerHTML = '';
-  if (music.src === "") return;
+  searchBox.value = "";
+  resultBox.innerHTML = "";
   if (music.paused || music.currentTime === 0) {
     music.play();
     startPlayingIcon.classList.replace("bi-play-fill", "bi-pause-fill");
     startWaving();
-    avalibleSongs.forEach((item) => {
-      if (+item.dataset.id === current) {
+    Array.from(document.querySelectorAll(".player__item")).forEach((item) => {
+      if (item.dataset.name === current) {
         item
-        .querySelector(".play-icon")
-        .classList.replace("bi-play-circle-fill", "bi-pause-circle-fill");
-        item.style.border = "2px solid #36e2ec";
-        downloadIcon.href = item.querySelector('h5').innerText;
-        console.log(downloadIcon.href);
+          .querySelector(".play-icon")
+          .classList.replace("bi-play-circle-fill", "bi-pause-circle-fill");
       }
     });
   } else {
     music.pause();
     startPlayingIcon.classList.replace("bi-pause-fill", "bi-play-fill");
-    avalibleSongs.forEach((item) => {
-      item
-      .querySelector(".play-icon")
-      .classList.replace("bi-pause-circle-fill", "bi-play-circle-fill");
+    Array.from(document.querySelectorAll(".player__item")).forEach((item) => {
+      if (item.dataset.name === current) {
+        item
+          .querySelector(".play-icon")
+          .classList.replace("bi-pause-circle-fill", "bi-play-circle-fill");
+      }
     });
     stopWaving();
   }
 });
 backIcon.addEventListener("click", () => {
-  let current_playing_id = parseInt(music.src.match(/\d+.mp3/g));
-  avalibleSongs.forEach((song) => {
-    if (+song.dataset.id === current_playing_id - 1) {
-      song.style.border = "2px solid #36e2ec";
-      song
-        .querySelector(".play-icon")
-        .classList.replace("bi-play-circle-fill", "bi-pause-circle-fill");
-    } else {
-      song.style.border = "none";
-      song
-        .querySelector(".play-icon")
-        .classList.replace("bi-pause-circle-fill", "bi-play-circle-fill");
-    }
-  });
-  music.src = `audio/${current_playing_id - 1}.mp3`;
-  downloadIcon.href = music.src;
-  music.play();
-  setMasterPlayInfo(current_playing_id - 1);
+  nextAndPrevSong("prev");
 });
 nextIcon.addEventListener("click", () => {
-  let current_playing_id = parseInt(music.src.match(/\d+.mp3/g));
-  avalibleSongs.forEach((song) => {
-    if (+song.dataset.id === current_playing_id + 1) {
-      song.style.border = "2px solid #36e2ec";
-      song
+  nextAndPrevSong("next");
+});
+function playMusic(item) {
+  // item.addEventListener("click", () => {
+    item.style.border = "2px solid #36e2ec";
+
+    if (item.classList.contains("loved")) {
+      loveThisSong("yes");
+    } else {
+      loveThisSong("no");
+    }
+
+    if (item.dataset.name !== current) {
+      current = item.dataset.name;
+      music.src = `audio/${current}`;
+    }
+    if (item.dataset.name === current) {
+      setDownloadInfo();
+    }
+    if (music.paused || music.currentTime === 0) {
+      music.play();
+      startPlayingIcon.classList.replace("bi-play-fill", "bi-pause-fill");
+      item
         .querySelector(".play-icon")
         .classList.replace("bi-play-circle-fill", "bi-pause-circle-fill");
+      startWaving();
     } else {
-      song.style.border = "none";
-      song
+      music.pause();
+      startPlayingIcon.classList.replace("bi-pause-fill", "bi-play-fill");
+      item
         .querySelector(".play-icon")
         .classList.replace("bi-pause-circle-fill", "bi-play-circle-fill");
+      stopWaving();
     }
-  });
-  music.src = `audio/${current_playing_id + 1}.mp3`;
-  downloadIcon.href = music.src;
-  music.play();
-  setMasterPlayInfo(current_playing_id + 1);
-});
-function startPlayingMusic(arr) {
-  arr.forEach((song) => {
-    song.querySelector("img").src = 'imgs/poster.jpg';
-
-    song.addEventListener("click", () => {
-      setDefaultStylesForSongs(arr);
-      song.style.border = "2px solid #36e2ec";
-
-      let song_id = song.dataset.id;
-      if (+song_id !== current) {
-        current = +song_id;
-        music.src = `audio/${current}.mp3`;
-        avalibleSongs.forEach(item => {
-          if (+item.dataset.id === current)
-          downloadIcon.href = item.querySelector('h5').innerHTML;
-        })
+    setMasterPlayInfo(item.dataset.name);
+  // });
+}
+function nextAndPrevSong(dir) {
+  let current_playing_element = Array.from(
+    document.querySelectorAll(".player__item")
+  ).filter((item) =>
+    item.querySelector("i").classList.contains("bi-pause-circle-fill")
+  )[0];
+  let coming_playing_element;
+  // const current_playing_parent = Array.from(current_playing_element.parentElement)
+  console.log(current_playing_element);
+    avalibleSongs.forEach((item, index) => {
+      if (item.dataset.name === current_playing_element.dataset.name) {
+        console.log(index);
+        // coming_playing_element = ;
+        playMusic(avalibleSongs[index + 1])
       }
-      if (music.paused || music.currentTime === 0) {
-        music.play();
-        startPlayingIcon.classList.replace("bi-play-fill", "bi-pause-fill");
-        song
-          .querySelector(".play-icon")
-          .classList.replace("bi-play-circle-fill", "bi-pause-circle-fill");
-        startWaving();
-      } else {
-        music.pause();
-        startPlayingIcon.classList.replace("bi-pause-fill", "bi-play-fill");
-        song
-          .querySelector(".play-icon")
-          .classList.replace("bi-pause-circle-fill", "bi-play-circle-fill");
-        stopWaving();
-      }
-      setMasterPlayInfo(song_id);
     });
-  });
+  // let current_playing_name = current.match(/\w+-?\w+/g)[0];
+  // let current_playing_index, coming_playing_index;
+  // const lovedSurahs = Array.from(document.querySelectorAll(".player__item"))
+  //   .filter((item) => item.classList.contains("loved-song"));
+
+  // lovedSurahs.forEach((item, index) => {
+  //   if(item === current) {
+  //     coming_playing_index = index + 1;
+  //   }
+  // })
+  // lovedSurahs.forEach((item, index) => {
+  //   if (index === coming_playing_index) {
+  //     playMusic(item)
+  //   }
+  // })
+  // lovedSurahs.forEach((item, index) => {
+  //   let itemName = item.querySelector('h5').innerText + '.mp3';
+  //   if(itemName === current) {
+  //     coming_playing_index = index + 1;
+  //   }
+  // })
+  // lovedSurahs[coming_playing_index].style.color = 'red'
+  // let current_playing_index, coming_playing_index;
+  // avalibleSongs.forEach((song, index) => {
+  //   if (song.dataset.name === current_playing_name) {
+  //     current_playing_index = index;
+  //   }
+  // });
+  // if (dir === "next") {
+  //   coming_playing_index = current_playing_index + 1;
+  // } else {
+  //   coming_playing_index = current_playing_index - 1;
+  // }
+  // avalibleSongs.forEach((song, index) => {
+  //   if (index === coming_playing_index) {
+  //     current = song.dataset.name;
+  //     music.src = `audio/${current}`;
+  //     music.play();
+  //     song.style.border = "2px solid #36e2ec";
+  //     song
+  //       .querySelector(".play-icon")
+  //       .classList.replace("bi-play-circle-fill", "bi-pause-circle-fill");
+  //     setDownloadInfo();
+  //     setMasterPlayInfo(current);
+  //   } else {
+  //     song.style.border = "none";
+  //     song
+  //       .querySelector(".play-icon")
+  //       .classList.replace("bi-pause-circle-fill", "bi-play-circle-fill");
+  //   }
+  // });
 }
 function startWaving() {
   document.querySelectorAll(".wave span").forEach((item) => {
@@ -174,7 +352,9 @@ function setTiming(time, ele) {
   if (musicMiuntes < 10) musicMiuntes = `0${musicMiuntes}`;
   if (musicSeconds < 10) musicSeconds = `0${musicSeconds}`;
   // with out (|| 0) it will evaluate NaN every time you switch the song
-  ele.innerText = `${musicHours || 0}:${musicMiuntes || 0}:${musicSeconds || 0}`;
+  ele.innerText = `${musicHours || 0}:${musicMiuntes || 0}:${
+    musicSeconds || 0
+  }`;
 }
 function updateSongProgressBar() {
   let passedTime = parseInt((music.currentTime / music.duration) * 100);
@@ -189,7 +369,7 @@ function moveProgressBarWhenClicking(e, bar) {
 }
 function setMasterPlayInfo(current) {
   avalibleSongs.forEach((song) => {
-    if (+song.dataset.id === +current) {
+    if (song.dataset.name === current) {
       masterPlayHeading.innerText = song.querySelector("h5").innerText;
       mainHeading.innerText = song.querySelector("h5").innerText;
     }
@@ -208,9 +388,8 @@ function setDefaultStylesForSongs(arr) {
 music.addEventListener("timeupdate", () => {
   let duration = music.duration;
   let currentTime = music.currentTime;
-
-  setTiming(currentTime, songStartingTime)
-  setTiming(duration, songEndingTime)
+  setTiming(currentTime, songStartingTime);
+  setTiming(duration, songEndingTime);
   updateSongProgressBar();
 });
 
@@ -254,7 +433,7 @@ for (let i = 0; i < arrows.length; i++) {
     let current_parent = e.currentTarget.parentElement.parentElement;
     let posters = current_parent.querySelector(".popular__posters");
 
-    if(posters.classList.contains('coming-soon')) return;
+    if (posters.classList.contains("coming-soon")) return;
 
     if (clicked_arrow.classList.contains("right-arrow")) {
       posters.scrollLeft += 300;
@@ -288,17 +467,15 @@ music.addEventListener("ended", () => {
   } else if (mood === "repeat_song") {
     music.play();
   } else {
-    let randomNum = Math.floor(Math.random() * 19);
-    // we add 1 to randomNum because, we start our dataset.id from 1 and randomNum could be 0 also adding 1 make it
-    // possible to get 19;
-    current = randomNum + 1;
-    music.src = `audio/${randomNum + 1}.mp3`;
+    let randomNum = Math.floor(Math.random() * 30);
+    current = allSongsNames[randomNum] + ".mp3";
+    music.src = `audio/${current}`;
     music.play();
-    setMasterPlayInfo(randomNum + 1);
-    console.log(music.src);
-    setDefaultStylesForSongs();
+    setMasterPlayInfo(current);
+    setDefaultStylesForSongs(avalibleSongs);
+    setDownloadInfo();
     avalibleSongs.forEach((item) => {
-      if (+item.dataset.id === randomNum + 1) {
+      if (item.dataset.name === current) {
         item.style.border = "2px solid #36e2ec";
         item
           .querySelector(".play-icon")
@@ -311,31 +488,23 @@ music.addEventListener("ended", () => {
 // ============================== Activate Search Box ==============================
 let searchBox = document.getElementById("search-box");
 let resultBox = document.querySelector(".player__search-results");
-const allSongsNames = avalibleSongs.map(
-  (item) => item.querySelector("h5").innerText.toLowerCase()
-);
+
 // with event (change) it executes after hitting -Enter-
 // when writing a capital letter using (shift + letter) this means to events so the code below will trigger twice
 searchBox.addEventListener("keyup", (e) => {
   resultBox.innerHTML = "";
-  
+
   // !e.shiftKey => To not trigger the event with shift key
   if (searchBox.value !== "" && !e.shiftKey) {
-    const searchedValuesIndexes = allSongsNames
-      .map((item, index) => {
-        if (item.includes(searchBox.value.toLowerCase())) {
-          return index;
-        }
-      })
-      .filter((item) => item !== undefined);
-
     const wantedSongs = avalibleSongs.filter((item) =>
-      searchedValuesIndexes.includes(+item.dataset.id - 1)
+      item.dataset.name.toLowerCase().includes(searchBox.value.toLowerCase())
     );
 
     wantedSongs.forEach((ele) => {
       let resultItem = `
-        <div class="player__songs-item searched-song" data-id=${ele.dataset.id}>
+        <div class="player__songs-item searched-song" data-name=${
+          ele.dataset.name
+        }>
           ${ele.querySelector("img").outerHTML}
           <div>
             ${ele.querySelector("h5").outerHTML}
@@ -359,4 +528,30 @@ searchBox.addEventListener("keyup", (e) => {
     resultBox.innerHTML = "";
   }
 });
+// ============================== Set Download Info ==============================
+function setDownloadInfo() {
+  avalibleSongs.forEach((item) => {
+    if (item.dataset.name === current) {
+      downloadIcon.href = `audio/${current}`;
+      downloadIcon.setAttribute("download", current);
+    }
+  });
+}
+// ============================== Activate Heart Icon ==============================
 
+function loveThisSong(answer) {
+  if (answer === "yes") {
+    btn.classList.add("active");
+    btn.querySelector("i").classList.replace("bi-heart", "bi-heart-fill");
+  } else {
+    btn.classList.remove("active");
+    btn.querySelector("i").classList.replace("bi-heart-fill", "bi-heart");
+  }
+}
+btn.addEventListener("click", () => {
+  let lovedSurah = avalibleSongs.filter(
+    (item) => item.dataset.name === current
+  )[0];
+  lovedSurah.classList.add("loved");
+  loveThisSong("yes");
+});

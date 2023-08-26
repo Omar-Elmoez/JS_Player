@@ -13,6 +13,7 @@ body {
   background-color: #121213;
   display: grid;
   place-items: center;
+  user-select: none;
 }
 /* ============================== Custom Styling ============================== */
 .player {
@@ -103,11 +104,24 @@ body {
 .player__songs-list {
   list-style: none;
 }
+.player__songs-list .img-play {
+  margin-left: 0;
+  flex-grow: 0;
+}
+.player__songs-list .img-play {
+  position: static;
+}
+.player__songs-list .img-play i {
+  position: absolute;
+  right: 5px;
+  opacity: 1;
+}
 .player__songs-item {
   display: flex;
   align-items: center;
-  padding: 5px 0 5px 10px;
+  padding: 5px 5px 5px 10px;
   cursor: pointer;
+  position: relative;
 }
 .player__songs-item:hover {
   background-color: #6969691a;
@@ -279,20 +293,25 @@ body {
 .player__btns button {
   width: 130px;
   padding-block: 10px;
-  text-transform: uppercase;
   border-radius: 20px;
   -webkit-border-radius: 20px;
   -moz-border-radius: 20px;
   -ms-border-radius: 20px;
   -o-border-radius: 20px;
   border: 2px solid #36e2ec;
-  outline: none;
   background-color: transparent;
+  outline: none;
   cursor: pointer;
   color: #fff;
+  font-size: 20px;
 }
 .player__btns button.active {
   background-color: #5adae0;
+}
+.player__btns button i {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .player__popular-songs,
 .player__popular-artists  {
