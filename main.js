@@ -161,7 +161,7 @@ function createLovedSurahsElements() {
         ? ""
         : `<span>${index}</span>`;
       sideSurahsBox.innerHTML += ` 
-        <li class="player__songs-item player__item loved-song">
+        <li class="player__songs-item player__item loved-song" data-name = ${item.dataset.name}>
           ${spanElement}
           ${item.innerHTML}
         </li>
@@ -176,8 +176,8 @@ function createLovedSurahsElements() {
         "data-name",
         `${item.querySelector("h5").innerText}.mp3`
       );
+      playMusic(item);
     });
-    playMusic(item);
   });
 }
 function showAllSurahs() {
@@ -227,107 +227,71 @@ nextIcon.addEventListener("click", () => {
   nextAndPrevSong("next");
 });
 function playMusic(item) {
-  // item.addEventListener("click", () => {
-    item.style.border = "2px solid #36e2ec";
+  item.style.border = "2px solid #36e2ec";
 
-    if (item.classList.contains("loved")) {
-      loveThisSong("yes");
-    } else {
-      loveThisSong("no");
-    }
+  if (item.classList.contains("loved")) {
+    loveThisSong("yes");
+  } else {
+    loveThisSong("no");
+  }
 
-    if (item.dataset.name !== current) {
-      current = item.dataset.name;
-      music.src = `audio/${current}`;
-    }
-    if (item.dataset.name === current) {
-      setDownloadInfo();
-    }
-    if (music.paused || music.currentTime === 0) {
-      music.play();
-      startPlayingIcon.classList.replace("bi-play-fill", "bi-pause-fill");
-      item
-        .querySelector(".play-icon")
-        .classList.replace("bi-play-circle-fill", "bi-pause-circle-fill");
-      startWaving();
-    } else {
-      music.pause();
-      startPlayingIcon.classList.replace("bi-pause-fill", "bi-play-fill");
-      item
-        .querySelector(".play-icon")
-        .classList.replace("bi-pause-circle-fill", "bi-play-circle-fill");
-      stopWaving();
-    }
-    setMasterPlayInfo(item.dataset.name);
-  // });
+  if (item.dataset.name !== current) {
+    current = item.dataset.name;
+    music.src = `audio/${current}`;
+  }
+  if (item.dataset.name === current) {
+    setDownloadInfo();
+  }
+  if (music.paused || music.currentTime === 0) {
+    music.play();
+    startPlayingIcon.classList.replace("bi-play-fill", "bi-pause-fill");
+    item
+      .querySelector(".play-icon")
+      .classList.replace("bi-play-circle-fill", "bi-pause-circle-fill");
+    startWaving();
+  } else {
+    music.pause();
+    startPlayingIcon.classList.replace("bi-pause-fill", "bi-play-fill");
+    item
+      .querySelector(".play-icon")
+      .classList.replace("bi-pause-circle-fill", "bi-play-circle-fill");
+    stopWaving();
+  }
+  setMasterPlayInfo(item.dataset.name);
 }
 function nextAndPrevSong(dir) {
+  let arr;
   let current_playing_element = Array.from(
     document.querySelectorAll(".player__item")
   ).filter((item) =>
     item.querySelector("i").classList.contains("bi-pause-circle-fill")
   )[0];
-  let coming_playing_element;
-  // const current_playing_parent = Array.from(current_playing_element.parentElement)
-  console.log(current_playing_element);
-    avalibleSongs.forEach((item, index) => {
-      if (item.dataset.name === current_playing_element.dataset.name) {
-        console.log(index);
-        // coming_playing_element = ;
-        playMusic(avalibleSongs[index + 1])
-      }
-    });
-  // let current_playing_name = current.match(/\w+-?\w+/g)[0];
-  // let current_playing_index, coming_playing_index;
-  // const lovedSurahs = Array.from(document.querySelectorAll(".player__item"))
-  //   .filter((item) => item.classList.contains("loved-song"));
-
-  // lovedSurahs.forEach((item, index) => {
-  //   if(item === current) {
-  //     coming_playing_index = index + 1;
-  //   }
-  // })
-  // lovedSurahs.forEach((item, index) => {
-  //   if (index === coming_playing_index) {
-  //     playMusic(item)
-  //   }
-  // })
-  // lovedSurahs.forEach((item, index) => {
-  //   let itemName = item.querySelector('h5').innerText + '.mp3';
-  //   if(itemName === current) {
-  //     coming_playing_index = index + 1;
-  //   }
-  // })
-  // lovedSurahs[coming_playing_index].style.color = 'red'
-  // let current_playing_index, coming_playing_index;
-  // avalibleSongs.forEach((song, index) => {
-  //   if (song.dataset.name === current_playing_name) {
-  //     current_playing_index = index;
-  //   }
-  // });
-  // if (dir === "next") {
-  //   coming_playing_index = current_playing_index + 1;
-  // } else {
-  //   coming_playing_index = current_playing_index - 1;
-  // }
-  // avalibleSongs.forEach((song, index) => {
-  //   if (index === coming_playing_index) {
-  //     current = song.dataset.name;
-  //     music.src = `audio/${current}`;
-  //     music.play();
-  //     song.style.border = "2px solid #36e2ec";
-  //     song
-  //       .querySelector(".play-icon")
-  //       .classList.replace("bi-play-circle-fill", "bi-pause-circle-fill");
-  //     setDownloadInfo();
-  //     setMasterPlayInfo(current);
-  //   } else {
-  //     song.style.border = "none";
-  //     song
-  //       .querySelector(".play-icon")
-  //       .classList.replace("bi-pause-circle-fill", "bi-play-circle-fill");
-  //   }
-  // });
+  let current_playing_index, coming_playing_index;
+  if (current_playing_element.classList.contains("loved-song")) {
+    arr = Array.from(document.querySelectorAll(".loved-song"));
+  } else if (current_playing_element.classList.contains("searched-song")) {
+    arr = Array.from(document.querySelectorAll(".searched-song"));
+  } else {
+    arr = avalibleSongs;
+  }
+  arr.forEach((item, index) => {
+    if (item.dataset.name === current_playing_element.dataset.name) {
+      current_playing_index = index;
+      item.style.border = "none";
+      item
+        .querySelector(".play-icon")
+        .classList.replace("bi-pause-circle-fill", "bi-play-circle-fill");
+    }
+  });
+  if (dir === "next") {
+    coming_playing_index = current_playing_index + 1;
+    if (coming_playing_index === arr.length) coming_playing_index = 0;
+    playMusic(arr[coming_playing_index]);
+  } else {
+    coming_playing_index = current_playing_index - 1;
+    if (coming_playing_index < 0) coming_playing_index = 0;
+    playMusic(arr[coming_playing_index]);
+  }
 }
 function startWaving() {
   document.querySelectorAll(".wave span").forEach((item) => {
@@ -502,7 +466,7 @@ searchBox.addEventListener("keyup", (e) => {
 
     wantedSongs.forEach((ele) => {
       let resultItem = `
-        <div class="player__songs-item searched-song" data-name=${
+        <div class="player__songs-item player__item searched-song" data-name=${
           ele.dataset.name
         }>
           ${ele.querySelector("img").outerHTML}
@@ -518,10 +482,10 @@ searchBox.addEventListener("keyup", (e) => {
     const searchedSongs = Array.from(
       document.querySelectorAll(".searched-song")
     );
-    startPlayingMusic(searchedSongs);
     searchedSongs.forEach((item) => {
       item.addEventListener("click", () => {
         avalibleSongs.forEach((item) => (item.style.border = "none"));
+        playMusic(item);
       });
     });
   } else {
