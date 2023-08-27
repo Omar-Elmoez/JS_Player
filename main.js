@@ -516,6 +516,10 @@ btn.addEventListener("click", () => {
   let lovedSurah = avalibleSongs.filter(
     (item) => item.dataset.name === current
   )[0];
-  lovedSurah.classList.add("loved");
-  loveThisSong("yes");
+  lovedSurah.classList.toggle("loved");
+  if (lovedSurah.classList.contains("loved")) {
+    loveThisSong("yes");
+  } else {
+    loveThisSong("no");
+  }
 });
