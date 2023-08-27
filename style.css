@@ -472,6 +472,8 @@ body {
   color: #fff;
   text-transform: capitalize;
   margin-left: 15px;
+  width: 60px;
+  text-align: center;
 }
 .player__master-play .song-name {
   font-size: 0.75rem;

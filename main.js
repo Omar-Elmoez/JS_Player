@@ -49,8 +49,7 @@ const surahsNames = [
   "Al-Naml",
   "Al-Kasas",
   "Al-Ankabot",
-  "Al-Rom",
-  "Lokman",
+  "Al-Rom", 
 ];
 createSurahsElements();
 const avalibleSongs = Array.from(document.querySelectorAll(".player__item"));
