@@ -49,7 +49,7 @@ const surahsNames = [
   "Al-Naml",
   "Al-Kasas",
   "Al-Ankabot",
-  "Al-Rom", 
+  "Al-Rom",
 ];
 createSurahsElements();
 const avalibleSongs = Array.from(document.querySelectorAll(".player__item"));
@@ -501,7 +501,6 @@ function setDownloadInfo() {
   });
 }
 // ============================== Activate Heart Icon ==============================
-
 function loveThisSong(answer) {
   if (answer === "yes") {
     btn.classList.add("active");
@@ -522,3 +521,73 @@ btn.addEventListener("click", () => {
     loveThisSong("no");
   }
 });
+// ============================== Activate API ==============================
+let choose_btn = document.getElementById("choose-reciter");
+let data,
+  all_options = [],
+  quranAudio = new Audio(),
+  reciterName,
+  surahIndex;
+let reciters_btn = document.querySelector(".drop-down__toggle-reciters");
+let recitersList = document.querySelector(".drop-down__options");
+let surahs_btn = document.querySelector(".drop-down__toggle-surahs");
+let surahs_bx = document.querySelector(".surahs-options");
+let surahsList = [];
+let starting_btn = document.getElementById('api-btn')
+
+choose_btn.addEventListener("click", () => {
+  document.querySelector(".player__overlay").style.cssText = `
+  backdrop-filter: blur(25px);
+  z-index: 10
+  `;
+  document.querySelector(".overlay__inner").style.top = "0";
+  starting_btn.style.display = 'block'
+  fetchdata();
+  surahsNames.forEach((name) => {
+    let surahItem = document.createElement("li");
+    surahItem.textContent = name;
+    surahs_bx.appendChild(surahItem);
+    surahsList.push(surahItem);
+  });
+});
+reciters_btn.addEventListener("click", () => {
+  recitersList.classList.toggle("active");
+  all_options.forEach((item) => {
+    item.addEventListener("click", () => {
+      reciters_btn.innerText = item.innerText;
+      recitersList.classList.remove("active");
+      data.forEach((reciterObj) => {
+        if (reciterObj.englishName === item.innerText) {
+          reciterName = reciterObj.identifier;
+        }
+      });
+    });
+  });
+});
+surahs_btn.addEventListener("click", () => {
+  surahs_bx.classList.toggle("active");
+  surahsList.forEach((item, index) => {
+    item.addEventListener("click", () => {
+      surahs_btn.innerText = item.innerText;
+      surahIndex = index + 1;
+      surahs_bx.classList.remove("active");
+    });
+  });
+});
+
+starting_btn.addEventListener('click', () => {
+  quranAudio.src = `https://cdn.islamic.network/quran/audio-surah/128/${reciterName}/${surahIndex}.mp3`;
+  quranAudio.play();
+})
+async function fetchdata() {
+  let responde = await fetch(
+    "https://raw.githubusercontent.com/islamic-network/cdn/master/info/cdn_surah_audio.json"
+  );
+  data = await responde.json();
+  for (let reciter of data) {
+    let reciterItem = document.createElement("li");
+    reciterItem.textContent = reciter.englishName;
+    recitersList.appendChild(reciterItem);
+    all_options.push(reciterItem);
+  }
+}

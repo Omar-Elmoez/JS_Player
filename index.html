@@ -21,6 +21,19 @@
   </head>
   <body>
     <div class="player">
+      <div class="player__overlay">
+        <div class="overlay__inner">
+          <div class="overlay__drop-down">
+            <div class="drop-down__toggle drop-down__toggle-reciters">-- Reciter --</div>
+            <ul class="drop-down__options"></ul>
+          </div>
+          <div class="overlay__drop-down">
+            <div class="drop-down__toggle drop-down__toggle-surahs">-- Surah --</div>
+            <ul class="drop-down__options surahs-options"></ul>
+          </div>
+          <button id="api-btn">Click To Listen</button>
+        </div>
+      </div>
       <div class="player__side-menu">
         <h1>Playlist</h1>
         <div class="player__play-list">
@@ -43,7 +56,7 @@
         <nav class="player__main-nav">
           <ul class="player__main-list">
             <li class="active">discover</li>
-            <li>Choose Reciter</li>
+            <li id="choose-reciter">Choose Reciter</li>
           </ul>
           <div class="player__search">
             <i class="bi bi-search"></i>
