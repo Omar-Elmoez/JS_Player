@@ -50,6 +50,90 @@ const surahsNames = [
   "Al-Kasas",
   "Al-Ankabot",
   "Al-Rom",
+  "Lokman",
+  "Al-Sajda",
+  "Al-Ahzab",
+  "Sabaa",
+  "Fater",
+  "Yassein",
+  "Al-Saffat",
+  "Sadd",
+  "Al-Zomar",
+  "Ghafer",
+  "Fosselat",
+  "Al-Shora",
+  "Al-Zokhrof",
+  "Al-Dokhan",
+  "Al-Jathia",
+  "Al-Ahkaf",
+  "Muhammad",
+  "Al-Fath",
+  "Al-Hojorat",
+  "kaf",
+  "Al-Zariat",
+  "Al-Tor",
+  "Al-Najm",
+  "Al-Kamar",
+  "Al-Rahman",
+  "Al-Wakea",
+  "Al-Hadid",
+  "Al-Mojadala",
+  "Al-Hashr",
+  "Al-Momtahana",
+  "Al-Saf",
+  "Al-Jomoa",
+  "Al-Monafekon",
+  "Al-Taghabon",
+  "Al-Talak",
+  "Al-Tahreem",
+  "Al-Molk",
+  "Al-kalam",
+  "Al-Hakka",
+  "Al-Maarej",
+  "Nouh",
+  "Al-Jen",
+  "Al-Mozamil",
+  "Al-Modather",
+  "Al-Keiama",
+  "Al-Ensan",
+  "Al-Morssalat",
+  "Al-Nabaa",
+  "Al-Nazeat",
+  "Abasa",
+  "Al-Takwir",
+  "Al-Enfetar",
+  "Al-Motaffefin",
+  "Al-Enshekak",
+  "Al-Boroj",
+  "Al-Tarek",
+  "Al-Aala",
+  "Al-Ghashia",
+  "Al-Fajr",
+  "Al-Balad",
+  "Al-Shams",
+  "Al-Lail",
+  "Al-Doha",
+  "Al-Sharh",
+  "Al-Teen",
+  "Al-Alak",
+  "Al-kadr.",
+  "Al-Baiena",
+  "Al-Zalzala",
+  "Al-Adiat",
+  "Al-Karea",
+  "Al-Takathor",
+  "Al-Asr",
+  "Al-Homaza",
+  "Al-Feel",
+  "Koraish",
+  "Al-Maaon",
+  "Al-Kawthar",
+  "Al-Kaferon",
+  "Al-Nasr",
+  "Al-Masad",
+  "Al-Ekhlas",
+  "Al-Falak",
+  "Al-Nas",
 ];
 createSurahsElements();
 const avalibleSongs = Array.from(document.querySelectorAll(".player__item"));
@@ -107,7 +191,7 @@ let songStartingTime = document.querySelector(".starting_time");
 let songEndingTime = document.querySelector(".Ending_time");
 let songProgressBar = document.querySelector(".song-progressBar");
 let volumeProgressBar = document.querySelector(".volume-progressBar");
-let volumeIcon = document.querySelector(".player__volume");
+let volumeIcon = document.querySelector(".player__volume-icon");
 // ============================== Create Songs Elements ==============================
 function setHoursAndMiuntesAndSeconds(time) {
   let allMinutesAvalible = parseInt(+time / 60);
@@ -135,7 +219,7 @@ function createSurahsElements() {
         </li>
         `;
       sideSurahsBox.innerHTML += surahElement;
-    } else {
+    } else if (index < 30) {
       let surahElement = `
         <div class="popular__posters-item player__item">
           <div class="img-play">
@@ -189,12 +273,12 @@ function showAllSurahs() {
     }
   });
 }
-setDownloadInfo();
 // ============================== Set All Subtitles Info ==============================
 
 startPlayingIcon.addEventListener("click", () => {
   searchBox.value = "";
   resultBox.innerHTML = "";
+  quranAudio.pause();
   if (music.paused || music.currentTime === 0) {
     music.play();
     startPlayingIcon.classList.replace("bi-play-fill", "bi-pause-fill");
@@ -218,6 +302,7 @@ startPlayingIcon.addEventListener("click", () => {
     });
     stopWaving();
   }
+  setDownloadInfo();
 });
 backIcon.addEventListener("click", () => {
   nextAndPrevSong("prev");
@@ -226,6 +311,8 @@ nextIcon.addEventListener("click", () => {
   nextAndPrevSong("next");
 });
 function playMusic(item) {
+  quranAudio.pause();
+  pause_icon.classList.replace("bi-pause-circle-fill", "bi-play-circle-fill");
   item.style.border = "2px solid #36e2ec";
 
   if (item.classList.contains("loved")) {
@@ -493,12 +580,8 @@ searchBox.addEventListener("keyup", (e) => {
 });
 // ============================== Set Download Info ==============================
 function setDownloadInfo() {
-  avalibleSongs.forEach((item) => {
-    if (item.dataset.name === current) {
-      downloadIcon.href = `audio/${current}`;
-      downloadIcon.setAttribute("download", current);
-    }
-  });
+  downloadIcon.href = `audio/${current}`;
+  downloadIcon.setAttribute("download", current);
 }
 // ============================== Activate Heart Icon ==============================
 function loveThisSong(answer) {
@@ -533,7 +616,8 @@ let recitersList = document.querySelector(".drop-down__options");
 let surahs_btn = document.querySelector(".drop-down__toggle-surahs");
 let surahs_bx = document.querySelector(".surahs-options");
 let surahsList = [];
-let starting_btn = document.getElementById('api-btn')
+let starting_btn = document.getElementById("api-btn");
+let pause_icon = document.querySelector(".pause-icon");
 
 choose_btn.addEventListener("click", () => {
   document.querySelector(".player__overlay").style.cssText = `
@@ -541,7 +625,6 @@ choose_btn.addEventListener("click", () => {
   z-index: 10
   `;
   document.querySelector(".overlay__inner").style.top = "0";
-  starting_btn.style.display = 'block'
   fetchdata();
   surahsNames.forEach((name) => {
     let surahItem = document.createElement("li");
@@ -552,8 +635,12 @@ choose_btn.addEventListener("click", () => {
 });
 reciters_btn.addEventListener("click", () => {
   recitersList.classList.toggle("active");
+  surahs_bx.classList.remove("active");
+  if (document.querySelector(".icon-bx p"))
+    document.querySelector(".icon-bx p").remove();
   all_options.forEach((item) => {
     item.addEventListener("click", () => {
+      surahs_btn.classList.remove("disabled")
       reciters_btn.innerText = item.innerText;
       recitersList.classList.remove("active");
       data.forEach((reciterObj) => {
@@ -564,21 +651,54 @@ reciters_btn.addEventListener("click", () => {
     });
   });
 });
-surahs_btn.addEventListener("click", () => {
-  surahs_bx.classList.toggle("active");
-  surahsList.forEach((item, index) => {
-    item.addEventListener("click", () => {
-      surahs_btn.innerText = item.innerText;
-      surahIndex = index + 1;
-      surahs_bx.classList.remove("active");
+surahs_btn.addEventListener("click", (e) => {
+  if (surahs_btn.classList.contains("disabled")) {
+    e.preventDefault();
+  } else {
+    surahs_bx.classList.toggle("active");
+    recitersList.classList.remove("active");
+    if (document.querySelector(".icon-bx p"))
+      document.querySelector(".icon-bx p").remove();
+    surahsList.forEach((item, index) => {
+      item.addEventListener("click", () => {
+        music.pause();
+        surahs_btn.innerText = item.innerText;
+        surahIndex = index + 1;
+        surahs_bx.classList.remove("active");
+        quranAudio.src = `https://cdn.islamic.network/quran/audio-surah/128/${reciterName}/${surahIndex}.mp3`;
+        downloadIcon.href = quranAudio.src;
+        downloadIcon.setAttribute("download", "");
+        document.querySelector(".loading-icon").style.opacity = "1";
+        document.querySelector(".pause-icon").style.opacity = "0";
+        pause_icon.classList.replace(
+          "bi-play-circle-fill",
+          "bi-pause-circle-fill"
+        );
+        quranAudio.play();
+        quranAudio.addEventListener("playing", () => {
+          document.querySelector(".loading-icon").style.opacity = "0";
+          document.querySelector(".pause-icon").style.opacity = "1";
+          if (document.querySelector(".icon-bx p"))
+            document.querySelector(".icon-bx p").remove();
+        });
+      });
     });
-  });
+  }
 });
-
-starting_btn.addEventListener('click', () => {
-  quranAudio.src = `https://cdn.islamic.network/quran/audio-surah/128/${reciterName}/${surahIndex}.mp3`;
-  quranAudio.play();
-})
+quranAudio.addEventListener("error", () => {
+  document.querySelector(".loading-icon").style.opacity = "0";
+  let msg = `<p>Sorry, Not Avalible For This Reciter</p>`;
+  document.querySelector(".icon-bx").innerHTML += msg;
+});
+pause_icon.addEventListener("click", () => {
+  if (pause_icon.classList.contains("bi-pause-circle-fill")) {
+    pause_icon.classList.replace("bi-pause-circle-fill", "bi-play-circle-fill");
+    quranAudio.pause();
+  } else {
+    pause_icon.classList.replace("bi-play-circle-fill", "bi-pause-circle-fill");
+    quranAudio.play();
+  }
+});
 async function fetchdata() {
   let responde = await fetch(
     "https://raw.githubusercontent.com/islamic-network/cdn/master/info/cdn_surah_audio.json"
@@ -591,3 +711,11 @@ async function fetchdata() {
     all_options.push(reciterItem);
   }
 }
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    document.querySelector(".player__overlay").style.cssText = `
+    backdrop-filter: blur(0);
+    z-index: -1
+    `;
+  }
+});

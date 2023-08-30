@@ -61,6 +61,17 @@ ul {
   display: flex;
   justify-content: center;
   align-items: center;
+  align-content: center;
+  gap: 40px;
+  flex-wrap: wrap;
+  padding-inline: 10px;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+}
+.overlay__inner .press-info {
+  position: absolute;
+  bottom: 5px;
+  color: #fff;
 }
 .overlay__drop-down {
   background-color: #c0392b;
@@ -69,6 +80,7 @@ ul {
   color: #fff;
   cursor: pointer;
   position: relative;
+  flex: 1;
 }
 .drop-down__toggle {
   padding: 10px;
@@ -78,6 +90,12 @@ ul {
   align-items: center;
   text-align: center;
   border: 2px solid #fff;
+  font-size: 1rem;
+}
+.drop-down__toggle.disabled {
+  background-color: #808080;
+  border-color: #808080;
+  cursor: not-allowed;
 }
 .drop-down__options {
   height: 0;
@@ -87,10 +105,12 @@ ul {
   -moz-transition: height 0.35s ease-in-out;
   -ms-transition: height 0.35s ease-in-out;
   -o-transition: height 0.35s ease-in-out;
-  /* border: 2px solid #fff; */
 }
 .drop-down__options.active {
   height: 200px;
+}
+.drop-down__options:not(.active) {
+  height: 0;
 }
 .drop-down__options::-webkit-scrollbar {
   display: none;
@@ -105,14 +125,31 @@ ul {
   color: #c0392b;
   background: #fff;
 }
-.player__overlay button {
-  padding: 10px 30px;
-  color: brown;
-  border: none;
-  outline: none;
+.player__overlay .icon-bx {
+  width: 100%;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+.player__overlay .icon-bx p {
+  color: #fff;
+  font-size: 1.2rem;
+}
+.player__overlay .icon-bx i {
+  font-size: 2rem;
+  color: #fff;
+  opacity: 0;
+  transition: 0.8s;
+  -webkit-transition: 0.8s;
+  -moz-transition: 0.8s;
+  -ms-transition: 0.8s;
+  -o-transition: 0.8s;
+}
+.player__overlay .icon-bx .pause-icon {
   cursor: pointer;
-  background-color: #ccc;
-  display: none;
+  position: absolute;
 }
 .player__side-menu,
 .player__main-menu {
@@ -547,6 +584,12 @@ ul {
     height: 10px;
   }
 }
+.player__master-play .surah-info {
+  width: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .player__master-play img {
   width: 35px;
   height: 35px;
@@ -561,7 +604,6 @@ ul {
 .player__master-play .current-info {
   color: #fff;
   text-transform: capitalize;
-  margin-left: 15px;
   width: 115px;
   text-align: center;
 }
@@ -574,15 +616,20 @@ ul {
   color: #4c5262;
 }
 .player__master-play .icons {
-  margin-left: 30px;
   display: flex;
   gap: 10px;
 }
 .player__master-play .icons i,
-.player__volume {
+.player__volume-icon {
   cursor: pointer;
   color: #fff;
   font-size: 20px;
+}
+.player__master-play .playing-info {
+  width: 60%;
+  margin-left: 20px;
+  display: flex;
+  align-items: center;
 }
 .player__master-play .starting_time,
 .player__master-play .Ending_time {
@@ -591,9 +638,10 @@ ul {
   font-size: 11px;
   color: #fff;
 }
-.player__bar {
+.player__bar:not(.player__volume-bar) {
   background: rgba(105, 105, 170, 0.1);
   cursor: pointer;
+  flex: 1;
 }
 .player__progressBar {
   width: 0;
@@ -630,19 +678,15 @@ ul {
   width: 50%;
 }
 .player__volume-bar {
-  flex-grow: 1;
+  width: 90px;
   margin-left: 10px;
 }
-.player__volume {
+.player__volume-icon {
   margin-left: 10px;
 }
 
 /* ================================== Media Query ================================== */
 @media (max-width: 1200px) {
-  .player__volume-bar {
-    flex-grow: 0;
-    width: 50px;
-  }
   .player__popular-artists,
   .player__master-play .wave {
     display: none;
@@ -666,11 +710,47 @@ ul {
   .player__main-menu {
     width: 100%;
   }
+  .player__main-menu {
+    text-align: center;
+  }
+  .player__search-results {
+    text-align: left;
+  }
   .player__main-nav {
     flex-wrap: wrap;
     gap: 12px;
+    justify-content: center;
+  }
+  .player__main-content {
+    margin-top: 10px;
   }
   .player__search {
     max-width: 100%;
+  }
+  .player__master-play {
+    flex-direction: column;
+    height: auto;
+    padding-block: 5px;
+  }
+  .player__volume,
+  .player__volume-bar,
+  .player__master-play img {
+    display: none;
+  }
+  .player__master-play .playing-info {
+    width: 100%;
+    margin-left: 0;
+  }
+  .overlay__inner {
+    flex-direction: column;
+    flex-wrap: nowrap;
+  }
+  .overlay__drop-down {
+    width: 95%;
+    flex: 0;
+    height: auto;
+  }
+  .drop-down__options.active {
+    height: 140px;
   }
 }
