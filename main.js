@@ -624,7 +624,8 @@ choose_btn.addEventListener("click", () => {
   document.querySelector('.player').style.cssText = `overflow-y: hidden;`
   document.querySelector(".player__overlay").style.cssText = `
   backdrop-filter: blur(25px);
-  z-index: 10
+  z-index: 10;
+  height: 100dvh;
   `;
   document.querySelector(".overlay__inner").style.cssText = `
   visibility: visible;
