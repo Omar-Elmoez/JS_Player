@@ -344,12 +344,14 @@ function nextAndPrevSong(dir) {
 function playMusic(item) {
   quranAudio.pause();
   pause_icon.classList.replace("bi-pause-circle-fill", "bi-play-circle-fill");
-  searchedSongs.forEach((item) => {
-    item.style.border = "none";
-    item
-    .querySelector(".play-icon")
-    .classList.replace("bi-pause-circle-fill", "bi-play-circle-fill");
-  });
+  if (searchBox.value !== '') {
+    searchedSongs.forEach((item) => {
+      item.style.border = "none";
+      item
+        .querySelector(".play-icon")
+        .classList.replace("bi-pause-circle-fill", "bi-play-circle-fill");
+    });
+  }
   item.style.border = "2px solid #36e2ec";
 
   if (item.classList.contains("loved")) {
@@ -563,9 +565,7 @@ searchBox.addEventListener("keyup", (e) => {
 
       resultBox.innerHTML += resultItem;
     });
-    searchedSongs = Array.from(
-      document.querySelectorAll(".searched-song")
-    );
+    searchedSongs = Array.from(document.querySelectorAll(".searched-song"));
     searchedSongs.forEach((item) => {
       item.addEventListener("click", () => {
         avalibleSongs.forEach((item) => (item.style.border = "none"));
