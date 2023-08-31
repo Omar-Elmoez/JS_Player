@@ -15,9 +15,17 @@ let sideSurahsBox = document.querySelector(".player__songs-list");
 let mainSurahsBox = document.querySelector(".popular__posters");
 let moodIcon = document.querySelector(".icons .mood_icon");
 let mainHeading = document.querySelector(".player__main-content h1");
+let songBar = document.querySelector(".player__song-bar");
+let volumeBar = document.querySelector(".player__volume-bar");
+let songStartingTime = document.querySelector(".starting_time");
+let songEndingTime = document.querySelector(".Ending_time");
+let songProgressBar = document.querySelector(".song-progressBar");
+let volumeProgressBar = document.querySelector(".volume-progressBar");
+let volumeIcon = document.querySelector(".player__volume-icon");
 // because we set a default song => this will make it dynamic if you want to change the default song
 let current = music.src.match(/\w+-?\w+.mp3/g)[0],
   clickedPosition,
+  searchedSongs,
   mood = "next_song";
 const surahsNames = [
   "Al-Fateha",
@@ -137,6 +145,9 @@ const surahsNames = [
 ];
 createSurahsElements();
 const avalibleSongs = Array.from(document.querySelectorAll(".player__item"));
+const allSongsNames = avalibleSongs.map(
+  (item) => item.querySelector("h5").innerText
+);
 const allSubtitles = Array.from(document.querySelectorAll(".subtitle"));
 avalibleSongs.forEach((item) => {
   item.addEventListener("click", () => {
@@ -173,29 +184,7 @@ playListItems.forEach((item) => {
   });
 });
 
-const allSongsNames = avalibleSongs.map(
-  (item) => item.querySelector("h5").innerText
-);
-
-let songBar = document.querySelector(".player__song-bar");
-let volumeBar = document.querySelector(".player__volume-bar");
-let songStartingTime = document.querySelector(".starting_time");
-let songEndingTime = document.querySelector(".Ending_time");
-let songProgressBar = document.querySelector(".song-progressBar");
-let volumeProgressBar = document.querySelector(".volume-progressBar");
-let volumeIcon = document.querySelector(".player__volume-icon");
 // ============================== Create Songs Elements ==============================
-function setHoursAndMiuntesAndSeconds(time) {
-  let allMinutesAvalible = parseInt(+time / 60);
-  let musicHours = parseInt(allMinutesAvalible / 60);
-  let musicMiuntes = parseInt(allMinutesAvalible % 60);
-  let musicSeconds = parseInt(+time % 60);
-  if (musicHours < 10) musicHours = `0${musicHours}`;
-  if (musicMiuntes < 10) musicMiuntes = `0${musicMiuntes}`;
-  if (musicSeconds < 10) musicSeconds = `0${musicSeconds}`;
-  // with out (|| 0) it will evaluate NaN every time you switch the song
-  return `${musicHours || 0}:${musicMiuntes || 0}:${musicSeconds || 0}`;
-}
 function createSurahsElements() {
   surahsNames.forEach((surah, index) => {
     if (index < 15) {
@@ -265,8 +254,20 @@ function showAllSurahs() {
     }
   });
 }
-// ============================== Set All Subtitles Info ==============================
+// ============================== Calc Hours & Minutes & Seconds ==============================
+function setHoursAndMiuntesAndSeconds(time) {
+  let allMinutesAvalible = parseInt(+time / 60);
+  let musicHours = parseInt(allMinutesAvalible / 60);
+  let musicMiuntes = parseInt(allMinutesAvalible % 60);
+  let musicSeconds = parseInt(+time % 60);
+  if (musicHours < 10) musicHours = `0${musicHours}`;
+  if (musicMiuntes < 10) musicMiuntes = `0${musicMiuntes}`;
+  if (musicSeconds < 10) musicSeconds = `0${musicSeconds}`;
+  // with out (|| 0) it will evaluate NaN every time you switch the song
+  return `${musicHours || 0}:${musicMiuntes || 0}:${musicSeconds || 0}`;
+}
 
+// ============================== Activate Start Playing Icon ==============================
 startPlayingIcon.addEventListener("click", () => {
   searchBox.value = "";
   resultBox.innerHTML = "";
@@ -296,47 +297,14 @@ startPlayingIcon.addEventListener("click", () => {
   }
   setDownloadInfo();
 });
+
+// ============================== Next & Prev ==============================
 backIcon.addEventListener("click", () => {
   nextAndPrevSong("prev");
 });
 nextIcon.addEventListener("click", () => {
   nextAndPrevSong("next");
 });
-function playMusic(item) {
-  quranAudio.pause();
-  pause_icon.classList.replace("bi-pause-circle-fill", "bi-play-circle-fill");
-  item.style.border = "2px solid #36e2ec";
-
-  if (item.classList.contains("loved")) {
-    loveThisSong("yes");
-  } else {
-    loveThisSong("no");
-  }
-
-  if (item.dataset.name !== current) {
-    current = item.dataset.name;
-    music.src = `audio/${current}`;
-  }
-  if (item.dataset.name === current) {
-    setDownloadInfo();
-  }
-  if (music.paused || music.currentTime === 0) {
-    music.play();
-    startPlayingIcon.classList.replace("bi-play-fill", "bi-pause-fill");
-    item
-      .querySelector(".play-icon")
-      .classList.replace("bi-play-circle-fill", "bi-pause-circle-fill");
-    startWaving();
-  } else {
-    music.pause();
-    startPlayingIcon.classList.replace("bi-pause-fill", "bi-play-fill");
-    item
-      .querySelector(".play-icon")
-      .classList.replace("bi-pause-circle-fill", "bi-play-circle-fill");
-    stopWaving();
-  }
-  setMasterPlayInfo(item.dataset.name);
-}
 function nextAndPrevSong(dir) {
   let arr;
   let current_playing_element = Array.from(
@@ -371,6 +339,51 @@ function nextAndPrevSong(dir) {
     playMusic(arr[coming_playing_index]);
   }
 }
+
+// ============================== Activate Playing Music ==============================
+function playMusic(item) {
+  quranAudio.pause();
+  pause_icon.classList.replace("bi-pause-circle-fill", "bi-play-circle-fill");
+  searchedSongs.forEach((item) => {
+    item.style.border = "none";
+    item
+    .querySelector(".play-icon")
+    .classList.replace("bi-pause-circle-fill", "bi-play-circle-fill");
+  });
+  item.style.border = "2px solid #36e2ec";
+
+  if (item.classList.contains("loved")) {
+    loveThisSong("yes");
+  } else {
+    loveThisSong("no");
+  }
+
+  if (item.dataset.name !== current) {
+    current = item.dataset.name;
+    music.src = `audio/${current}`;
+  }
+  if (item.dataset.name === current) {
+    setDownloadInfo();
+  }
+  if (music.paused || music.currentTime === 0) {
+    music.play();
+    startPlayingIcon.classList.replace("bi-play-fill", "bi-pause-fill");
+    item
+      .querySelector(".play-icon")
+      .classList.replace("bi-play-circle-fill", "bi-pause-circle-fill");
+    startWaving();
+  } else {
+    music.pause();
+    startPlayingIcon.classList.replace("bi-pause-fill", "bi-play-fill");
+    item
+      .querySelector(".play-icon")
+      .classList.replace("bi-pause-circle-fill", "bi-play-circle-fill");
+    stopWaving();
+  }
+  setMasterPlayInfo(item.dataset.name);
+}
+
+// ============================== Activate Waving ==============================
 function startWaving() {
   document.querySelectorAll(".wave span").forEach((item) => {
     item.style.cssText = `
@@ -385,19 +398,8 @@ function stopWaving() {
     `;
   });
 }
-function setTiming(time, ele) {
-  let allMinutesAvalible = parseInt(time / 60);
-  let musicHours = parseInt(allMinutesAvalible / 60);
-  let musicMiuntes = parseInt(allMinutesAvalible % 60);
-  let musicSeconds = parseInt(time % 60);
-  if (musicHours < 10) musicHours = `0${musicHours}`;
-  if (musicMiuntes < 10) musicMiuntes = `0${musicMiuntes}`;
-  if (musicSeconds < 10) musicSeconds = `0${musicSeconds}`;
-  // with out (|| 0) it will evaluate NaN every time you switch the song
-  ele.innerText = `${musicHours || 0}:${musicMiuntes || 0}:${
-    musicSeconds || 0
-  }`;
-}
+
+// ============================== Control Progress Bar  ==============================
 function updateSongProgressBar() {
   let passedTime = parseInt((music.currentTime / music.duration) * 100);
   songProgressBar.style.width = `${passedTime}%`;
@@ -409,6 +411,8 @@ function moveProgressBarWhenClicking(e, bar) {
   bar.style.width = `${clickedPosition}px`;
   document.documentElement.style.setProperty("--moveFromLeft", "100%");
 }
+
+// ============================== Set Master Play Info  ==============================
 function setMasterPlayInfo(current) {
   avalibleSongs.forEach((song) => {
     if (song.dataset.name === current) {
@@ -418,6 +422,8 @@ function setMasterPlayInfo(current) {
   });
 }
 setMasterPlayInfo(current);
+
+// ============================== Default Setting  ==============================
 function setDefaultStylesForSongs(arr) {
   arr.forEach((item) => {
     item.style.border = "none";
@@ -426,15 +432,13 @@ function setDefaultStylesForSongs(arr) {
       .classList.replace("bi-pause-circle-fill", "bi-play-circle-fill");
   });
 }
+
 // ============================== Activate Timing ==============================
 music.addEventListener("timeupdate", () => {
-  let duration = music.duration;
-  let currentTime = music.currentTime;
-  setTiming(currentTime, songStartingTime);
-  setTiming(duration, songEndingTime);
+  songStartingTime.innerText = setHoursAndMiuntesAndSeconds(music.currentTime);
+  songEndingTime.innerText = setHoursAndMiuntesAndSeconds(music.duration);
   updateSongProgressBar();
 });
-
 songBar.addEventListener("click", (e) => {
   moveProgressBarWhenClicking(e, songProgressBar);
   // songProgressBar.parentElement.offsetWidth => to get the width of its parent, because this is
@@ -443,6 +447,7 @@ songBar.addEventListener("click", (e) => {
     (clickedPosition / songProgressBar.parentElement.offsetWidth) *
     music.duration;
 });
+
 // ============================== Activate Sound ==============================
 volumeBar.addEventListener("click", (e) => {
   moveProgressBarWhenClicking(e, volumeProgressBar);
@@ -466,6 +471,7 @@ volumeIcon.addEventListener("click", () => {
     music.volume = 1;
   }
 });
+
 // ============================== Activate Arrows ==============================
 const arrows = Array.from(document.querySelectorAll(".popular__arrows"));
 
@@ -484,6 +490,7 @@ for (let i = 0; i < arrows.length; i++) {
     }
   });
 }
+
 // ============================== Changing Mood ==============================
 moodIcon.addEventListener("click", () => {
   switch (mood) {
@@ -502,7 +509,6 @@ moodIcon.addEventListener("click", () => {
       moodIcon.classList.replace("bi-shuffle", "bi-music-note-beamed");
   }
 });
-
 music.addEventListener("ended", () => {
   if (mood === "next_song") {
     nextIcon.click();
@@ -557,7 +563,7 @@ searchBox.addEventListener("keyup", (e) => {
 
       resultBox.innerHTML += resultItem;
     });
-    const searchedSongs = Array.from(
+    searchedSongs = Array.from(
       document.querySelectorAll(".searched-song")
     );
     searchedSongs.forEach((item) => {
@@ -570,11 +576,13 @@ searchBox.addEventListener("keyup", (e) => {
     resultBox.innerHTML = "";
   }
 });
+
 // ============================== Set Download Info ==============================
 function setDownloadInfo() {
   downloadIcon.href = `audio/${current}`;
   downloadIcon.setAttribute("download", current);
 }
+
 // ============================== Activate Heart Icon ==============================
 function loveThisSong(answer) {
   if (answer === "yes") {
@@ -596,6 +604,7 @@ btn.addEventListener("click", () => {
     loveThisSong("no");
   }
 });
+
 // ============================== Activate API ==============================
 let choose_btn = document.getElementById("choose-reciter");
 let data,
