@@ -1,4 +1,4 @@
-let music = new Audio("audio/Mariam.mp3");
+let music = new Audio("audio/Al-Rom.mp3");
 let startPlayingIcon = document.querySelector(".start-playing-icon");
 let btn = document.querySelector(".player__btns button");
 let backIcon = document.querySelector(".back-icon");
