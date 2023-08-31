@@ -666,6 +666,7 @@ surahs_btn.addEventListener("click", (e) => {
     surahsList.forEach((item, index) => {
       item.addEventListener("click", () => {
         music.pause();
+        startPlayingIcon.classList.replace("bi-pause-fill", "bi-play-fill");
         surahs_btn.innerText = item.innerText;
         surahIndex = index + 1;
         surahs_bx.classList.remove("active");
