@@ -1,2 +1,2 @@
 # JS_Player
- Music Player
+ Quran Player
