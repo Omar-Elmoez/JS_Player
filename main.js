@@ -153,20 +153,21 @@ function setDataNamesAndDurations() {
     relatedAudio.addEventListener("durationchange", () => {
       let itemDuration = relatedAudio.duration;
       item.setAttribute("data-duration", itemDuration);
+      item.querySelector(".subtitle").innerText = setHoursAndMiuntesAndSeconds(itemDuration);
     });
   });
 }
-function setSubtitlesInfo() {
-  avalibleSongs.forEach((item) => {
-    item.querySelector(".subtitle").innerText = setHoursAndMiuntesAndSeconds(
-      item.dataset.duration
-    );
-  });
-}
+// function setSubtitlesInfo() {
+//   avalibleSongs.forEach((item) => {
+//     item.querySelector(".subtitle").innerText = setHoursAndMiuntesAndSeconds(
+//       item.dataset.duration
+//     );
+//   });
+// }
 setDataNamesAndDurations();
-setTimeout(() => {
-  setSubtitlesInfo();
-}, 3000);
+// setTimeout(() => {
+//   setSubtitlesInfo();
+// }, 3000);
 // ============================== Player Play List ==============================
 playListItems.forEach((item) => {
   item.addEventListener("click", () => {
@@ -624,7 +625,10 @@ choose_btn.addEventListener("click", () => {
   backdrop-filter: blur(25px);
   z-index: 10
   `;
-  document.querySelector(".overlay__inner").style.top = "0";
+  document.querySelector(".overlay__inner").style.cssText = `
+  visibility: visible;
+  top: 0;
+  `;
   fetchdata();
   surahsNames.forEach((name) => {
     let surahItem = document.createElement("li");
@@ -719,3 +723,11 @@ document.addEventListener("keydown", (e) => {
     `;
   }
 });
+document.addEventListener('click', (e) => {
+  if (e.target.classList.contains('player__overlay')) {
+    document.querySelector(".player__overlay").style.cssText = `
+    backdrop-filter: blur(0);
+    z-index: -1
+    `;
+  }
+})
