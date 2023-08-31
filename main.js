@@ -152,7 +152,9 @@ function setDataNamesAndDurations() {
     let relatedAudio = new Audio(`audio/${item.dataset.name}`);
     relatedAudio.addEventListener("durationchange", () => {
       item.setAttribute("data-duration", relatedAudio.duration);
-      item.querySelector(".subtitle").innerText = setHoursAndMiuntesAndSeconds(relatedAudio.duration);
+      item.querySelector(".subtitle").innerText = setHoursAndMiuntesAndSeconds(
+        relatedAudio.duration
+      );
     });
   });
 }
@@ -633,7 +635,7 @@ reciters_btn.addEventListener("click", () => {
     document.querySelector(".icon-bx p").remove();
   all_options.forEach((item) => {
     item.addEventListener("click", () => {
-      surahs_btn.classList.remove("disabled")
+      surahs_btn.classList.remove("disabled");
       reciters_btn.innerText = item.innerText;
       recitersList.classList.remove("active");
       data.forEach((reciterObj) => {
@@ -712,11 +714,11 @@ document.addEventListener("keydown", (e) => {
     `;
   }
 });
-document.addEventListener('click', (e) => {
-  if (e.target.classList.contains('player__overlay')) {
+document.addEventListener("click", (e) => {
+  if (e.target.classList.contains("player__overlay")) {
     document.querySelector(".player__overlay").style.cssText = `
     backdrop-filter: blur(0);
     z-index: -1
     `;
   }
-})
+});
