@@ -639,21 +639,20 @@ ul {
   font-size: 11px;
   color: #fff;
 }
-.player__bar:not(.player__volume-bar) {
+.player__bar {
   background: rgba(105, 105, 170, 0.1);
   cursor: pointer;
-  flex: 1;
 }
 .player__progressBar {
   width: 0;
   height: 2px;
   background-color: #36e2ec;
   position: relative;
-  transition: width 0.2s;
-  -webkit-transition: width 0.2s;
-  -moz-transition: width 0.2s;
-  -ms-transition: width 0.2s;
-  -o-transition: width 0.2s;
+  transition: width 0.4s;
+  -webkit-transition: width 0.4s;
+  -moz-transition: width 0.4s;
+  -ms-transition: width 0.4s;
+  -o-transition: width 0.4s;
 }
 .player__progressBar::before {
   content: "";
@@ -676,7 +675,7 @@ ul {
   left: 100%;
 }
 .player__song-bar {
-  width: 50%;
+  flex: 1;
 }
 .player__volume-bar {
   width: 90px;

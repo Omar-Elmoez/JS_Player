@@ -1,4 +1,4 @@
-let music = new Audio("audio/Al-Rom.mp3");
+let music = new Audio("audio/Mariam.mp3");
 let startPlayingIcon = document.querySelector(".start-playing-icon");
 let btn = document.querySelector(".player__btns button");
 let backIcon = document.querySelector(".back-icon");
@@ -27,6 +27,20 @@ let current = music.src.match(/\w+-?\w+.mp3/g)[0],
   clickedPosition,
   searchedSongs,
   mood = "next_song";
+let choose_btn = document.getElementById("choose-reciter");
+let data,
+  all_options = [],
+  quranAudio = new Audio(),
+  reciterName,
+  surahIndex,
+  audioPlayingNow;
+let reciters_btn = document.querySelector(".drop-down__toggle-reciters");
+let recitersList = document.querySelector(".drop-down__options");
+let surahs_btn = document.querySelector(".drop-down__toggle-surahs");
+let surahs_bx = document.querySelector(".surahs-options");
+let surahsList = [];
+let starting_btn = document.getElementById("api-btn");
+let pause_icon = document.querySelector(".pause-icon");
 const surahsNames = [
   "Al-Fateha",
   "Al-Bakara",
@@ -271,46 +285,56 @@ function setHoursAndMiuntesAndSeconds(time) {
 startPlayingIcon.addEventListener("click", () => {
   searchBox.value = "";
   resultBox.innerHTML = "";
-  quranAudio.pause();
-  if (music.paused || music.currentTime === 0) {
-    music.play();
-    startPlayingIcon.classList.replace("bi-play-fill", "bi-pause-fill");
-    startWaving();
-    Array.from(document.querySelectorAll(".player__item")).forEach((item) => {
-      if (item.dataset.name === current) {
-        item
-          .querySelector(".play-icon")
-          .classList.replace("bi-play-circle-fill", "bi-pause-circle-fill");
-      }
-    });
+  if (audioPlayingNow === "api") {
+    if (!quranAudio.paused) {
+      stopWaving();
+      quranAudio.pause();
+      startPlayingIcon.classList.replace("bi-pause-fill", "bi-play-fill");
+    } else {
+      quranAudio.play();
+    }
   } else {
-    music.pause();
-    startPlayingIcon.classList.replace("bi-pause-fill", "bi-play-fill");
-    Array.from(document.querySelectorAll(".player__item")).forEach((item) => {
-      if (item.dataset.name === current) {
-        item
-          .querySelector(".play-icon")
-          .classList.replace("bi-pause-circle-fill", "bi-play-circle-fill");
-      }
-    });
-    stopWaving();
+    if (music.paused || music.currentTime === 0) {
+      music.play();
+      startPlayingIcon.classList.replace("bi-play-fill", "bi-pause-fill");
+      startWaving();
+      Array.from(document.querySelectorAll(".player__item")).forEach((item) => {
+        if (item.dataset.name === current) {
+          item.style.border = "2px solid #36e2ec";
+          item
+            .querySelector(".play-icon")
+            .classList.replace("bi-play-circle-fill", "bi-pause-circle-fill");
+        }
+      });
+    } else {
+      music.pause();
+      startPlayingIcon.classList.replace("bi-pause-fill", "bi-play-fill");
+      Array.from(document.querySelectorAll(".player__item")).forEach((item) => {
+        if (item.dataset.name === current) {
+          item
+            .querySelector(".play-icon")
+            .classList.replace("bi-pause-circle-fill", "bi-play-circle-fill");
+        }
+      });
+      stopWaving();
+    }
+    setDownloadInfo();
   }
-  setDownloadInfo();
 });
 
 // ============================== Next & Prev ==============================
 backIcon.addEventListener("click", () => {
-  nextAndPrevSong("prev");
+  if (audioPlayingNow === "local") nextAndPrevSong("prev");
 });
 nextIcon.addEventListener("click", () => {
-  nextAndPrevSong("next");
+  if (audioPlayingNow === "local") nextAndPrevSong("next");
 });
 function nextAndPrevSong(dir) {
   let arr;
   let current_playing_element = Array.from(
     document.querySelectorAll(".player__item")
-  ).filter((item) =>
-    item.querySelector("i").classList.contains("bi-pause-circle-fill")
+  ).filter(
+    (item) => getComputedStyle(item).borderColor === "rgb(54, 226, 236)"
   )[0];
   let current_playing_index, coming_playing_index;
   if (current_playing_element.classList.contains("loved-song")) {
@@ -339,12 +363,32 @@ function nextAndPrevSong(dir) {
     playMusic(arr[coming_playing_index]);
   }
 }
-
+function activateNextAndPrevOrNot() {
+  const iconsArr = [
+    document.querySelector(".back-icon"),
+    document.querySelector(".next-icon"),
+  ];
+  if (audioPlayingNow === "api") {
+    iconsArr.forEach((icon) => {
+      icon.style.cssText = `
+        color: #808080;
+        cursor: not-allowed;
+      `;
+    });
+  } else {
+    iconsArr.forEach((icon) => {
+      icon.style.cssText = `
+        color: #fff;
+        cursor: pointer;
+      `;
+    });
+  }
+}
 // ============================== Activate Playing Music ==============================
 function playMusic(item) {
   quranAudio.pause();
   pause_icon.classList.replace("bi-pause-circle-fill", "bi-play-circle-fill");
-  if (searchBox.value !== '') {
+  if (searchBox.value !== "") {
     searchedSongs.forEach((item) => {
       item.style.border = "none";
       item
@@ -353,7 +397,7 @@ function playMusic(item) {
     });
   }
   item.style.border = "2px solid #36e2ec";
-
+  songProgressBar.style.width = `0`;
   if (item.classList.contains("loved")) {
     loveThisSong("yes");
   } else {
@@ -402,11 +446,6 @@ function stopWaving() {
 }
 
 // ============================== Control Progress Bar  ==============================
-function updateSongProgressBar() {
-  let passedTime = parseInt((music.currentTime / music.duration) * 100);
-  songProgressBar.style.width = `${passedTime}%`;
-  document.documentElement.style.setProperty("--moveFromLeft", "100%");
-}
 function moveProgressBarWhenClicking(e, bar) {
   clickedPosition = e.clientX - e.target.offsetLeft;
   if (clickedPosition > bar.parentElement.offsetWidth) return;
@@ -414,6 +453,28 @@ function moveProgressBarWhenClicking(e, bar) {
   document.documentElement.style.setProperty("--moveFromLeft", "100%");
 }
 
+// ============================== Music And Quran Audio  ==============================
+music.addEventListener("playing", () => {
+  audioPlayingNow = "local";
+  setStartAndEndTime(music);
+  updateAudio(music);
+  activateNextAndPrevOrNot();
+});
+quranAudio.addEventListener("playing", () => {
+  audioPlayingNow = "api";
+  setStartAndEndTime(quranAudio);
+  updateAudio(quranAudio);
+  startPlayingIcon.classList.replace("bi-play-fill", "bi-pause-fill");
+  masterPlayHeading.innerText = surahs_btn.innerText;
+  mainHeading.innerText = surahs_btn.innerText;
+  startWaving();
+  activateNextAndPrevOrNot();
+  document.querySelector(".loading-icon").style.opacity = "0";
+  document.querySelector(".pause-icon").style.opacity = "1";
+  avalibleSongs.forEach(item => item.style.border = 'none')
+  if (document.querySelector(".icon-bx p"))
+    document.querySelector(".icon-bx p").remove();
+});
 // ============================== Set Master Play Info  ==============================
 function setMasterPlayInfo(current) {
   avalibleSongs.forEach((song) => {
@@ -436,25 +497,31 @@ function setDefaultStylesForSongs(arr) {
 }
 
 // ============================== Activate Timing ==============================
-music.addEventListener("timeupdate", () => {
-  songStartingTime.innerText = setHoursAndMiuntesAndSeconds(music.currentTime);
-  songEndingTime.innerText = setHoursAndMiuntesAndSeconds(music.duration);
-  updateSongProgressBar();
-});
-songBar.addEventListener("click", (e) => {
-  moveProgressBarWhenClicking(e, songProgressBar);
-  // songProgressBar.parentElement.offsetWidth => to get the width of its parent, because this is
-  // the avalible for it to move.
-  music.currentTime =
-    (clickedPosition / songProgressBar.parentElement.offsetWidth) *
-    music.duration;
-});
+function setStartAndEndTime(audio) {
+  songEndingTime.innerText = setHoursAndMiuntesAndSeconds(audio.duration);
+  audio.addEventListener("timeupdate", () => {
+    songStartingTime.innerText = setHoursAndMiuntesAndSeconds(
+      audio.currentTime
+    );
+  });
+}
+function updateAudio(audio) {
+  songBar.addEventListener("click", (e) => {
+    moveProgressBarWhenClicking(e, songProgressBar);
+    // songProgressBar.parentElement.offsetWidth => to get the width of its parent, because this is
+    // the avalible for it to move.
+    audio.currentTime =
+      (clickedPosition / songProgressBar.parentElement.offsetWidth) *
+      audio.duration;
+  });
+}
 
 // ============================== Activate Sound ==============================
 volumeBar.addEventListener("click", (e) => {
   moveProgressBarWhenClicking(e, volumeProgressBar);
   // the range of music.volume => [0,1]
   music.volume = clickedPosition / 100 > 1 ? 1 : clickedPosition / 100;
+  quranAudio.volume = clickedPosition / 100 > 1 ? 1 : clickedPosition / 100;
   volumeIcon.classList.replace("bi-volume-mute-fill", "bi-volume-down-fill");
   volumeIcon.classList.replace("bi-volume-up-fill", "bi-volume-down-fill");
 });
@@ -467,10 +534,13 @@ volumeIcon.addEventListener("click", () => {
     volumeIcon.classList.replace("bi-volume-down-fill", "bi-volume-mute-fill");
     volumeProgressBar.style.width = 0;
     music.volume = 0;
+    quranAudio.volume = 0;
   } else {
     volumeIcon.classList.replace("bi-volume-mute-fill", "bi-volume-up-fill");
+
     volumeProgressBar.style.width = `100%`;
     music.volume = 1;
+    quranAudio.volume = 1;
   }
 });
 
@@ -606,22 +676,8 @@ btn.addEventListener("click", () => {
 });
 
 // ============================== Activate API ==============================
-let choose_btn = document.getElementById("choose-reciter");
-let data,
-  all_options = [],
-  quranAudio = new Audio(),
-  reciterName,
-  surahIndex;
-let reciters_btn = document.querySelector(".drop-down__toggle-reciters");
-let recitersList = document.querySelector(".drop-down__options");
-let surahs_btn = document.querySelector(".drop-down__toggle-surahs");
-let surahs_bx = document.querySelector(".surahs-options");
-let surahsList = [];
-let starting_btn = document.getElementById("api-btn");
-let pause_icon = document.querySelector(".pause-icon");
-
 choose_btn.addEventListener("click", () => {
-  document.querySelector('.player').style.cssText = `overflow-y: hidden;`
+  document.querySelector(".player").style.cssText = `overflow-y: hidden;`;
   document.querySelector(".player__overlay").style.cssText = `
   backdrop-filter: blur(25px);
   z-index: 10;
@@ -668,7 +724,7 @@ surahs_btn.addEventListener("click", (e) => {
     surahsList.forEach((item, index) => {
       item.addEventListener("click", () => {
         music.pause();
-        startPlayingIcon.classList.replace("bi-pause-fill", "bi-play-fill");
+        songProgressBar.style.width = `0`;
         surahs_btn.innerText = item.innerText;
         surahIndex = index + 1;
         surahs_bx.classList.remove("active");
@@ -682,12 +738,6 @@ surahs_btn.addEventListener("click", (e) => {
           "bi-pause-circle-fill"
         );
         quranAudio.play();
-        quranAudio.addEventListener("playing", () => {
-          document.querySelector(".loading-icon").style.opacity = "0";
-          document.querySelector(".pause-icon").style.opacity = "1";
-          if (document.querySelector(".icon-bx p"))
-            document.querySelector(".icon-bx p").remove();
-        });
       });
     });
   }
@@ -724,7 +774,7 @@ document.addEventListener("keydown", (e) => {
     backdrop-filter: blur(0);
     z-index: -1
     `;
-    document.querySelector('.player').style.cssText = `overflow-y: auto;`
+    document.querySelector(".player").style.cssText = `overflow-y: auto;`;
   }
 });
 document.addEventListener("click", (e) => {
@@ -733,6 +783,6 @@ document.addEventListener("click", (e) => {
     backdrop-filter: blur(0);
     z-index: -1
     `;
-    document.querySelector('.player').style.cssText = `overflow-y: auto;`
+    document.querySelector(".player").style.cssText = `overflow-y: auto;`;
   }
 });
