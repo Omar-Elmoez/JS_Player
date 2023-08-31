@@ -723,6 +723,7 @@ document.addEventListener("keydown", (e) => {
     backdrop-filter: blur(0);
     z-index: -1
     `;
+    document.querySelector('.player').style.cssText = `overflow-y: auto;`
   }
 });
 document.addEventListener("click", (e) => {
@@ -731,5 +732,6 @@ document.addEventListener("click", (e) => {
     backdrop-filter: blur(0);
     z-index: -1
     `;
+    document.querySelector('.player').style.cssText = `overflow-y: auto;`
   }
 });
