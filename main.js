@@ -621,6 +621,7 @@ let starting_btn = document.getElementById("api-btn");
 let pause_icon = document.querySelector(".pause-icon");
 
 choose_btn.addEventListener("click", () => {
+  document.querySelector('.player').style.cssText = `overflow-y: hidden;`
   document.querySelector(".player__overlay").style.cssText = `
   backdrop-filter: blur(25px);
   z-index: 10
