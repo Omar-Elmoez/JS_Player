@@ -151,23 +151,12 @@ function setDataNamesAndDurations() {
     item.setAttribute("data-name", `${item_id}.mp3`);
     let relatedAudio = new Audio(`audio/${item.dataset.name}`);
     relatedAudio.addEventListener("durationchange", () => {
-      let itemDuration = relatedAudio.duration;
-      item.setAttribute("data-duration", itemDuration);
-      item.querySelector(".subtitle").innerText = setHoursAndMiuntesAndSeconds(itemDuration);
+      item.setAttribute("data-duration", relatedAudio.duration);
+      item.querySelector(".subtitle").innerText = setHoursAndMiuntesAndSeconds(relatedAudio.duration);
     });
   });
 }
-// function setSubtitlesInfo() {
-//   avalibleSongs.forEach((item) => {
-//     item.querySelector(".subtitle").innerText = setHoursAndMiuntesAndSeconds(
-//       item.dataset.duration
-//     );
-//   });
-// }
 setDataNamesAndDurations();
-// setTimeout(() => {
-//   setSubtitlesInfo();
-// }, 3000);
 // ============================== Player Play List ==============================
 playListItems.forEach((item) => {
   item.addEventListener("click", () => {
