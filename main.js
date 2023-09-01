@@ -26,6 +26,7 @@ let volumeIcon = document.querySelector(".player__volume-icon");
 let current = music.src.match(/\w+-?\w+.mp3/g)[0],
   clickedPosition,
   searchedSongs,
+  lovedSurahs,
   mood = "next_song";
 let choose_btn = document.getElementById("choose-reciter");
 let data,
@@ -173,11 +174,10 @@ avalibleSongs.forEach((item) => {
 });
 // ============================== set Data Names And Durations ==============================
 function setDataNamesAndDurations() {
-  let relatedAudio = new Audio();
   avalibleSongs.forEach((item) => {
     let item_id = item.querySelector("h5").innerText;
     item.setAttribute("data-name", `${item_id}.mp3`);
-    relatedAudio.src = `audio/${item.dataset.name}`;
+    let relatedAudio = new Audio(`audio/${item.dataset.name}`);
     relatedAudio.addEventListener("durationchange", () => {
       item.setAttribute("data-duration", relatedAudio.duration);
       item.querySelector(".subtitle").innerText = setHoursAndMiuntesAndSeconds(
@@ -249,7 +249,7 @@ function createLovedSurahsElements() {
       `;
     }
   });
-  const lovedSurahs = Array.from(document.querySelectorAll(".loved-song"));
+  lovedSurahs = Array.from(document.querySelectorAll(".loved-song"));
   lovedSurahs.forEach((item) => {
     item.addEventListener("click", () => {
       setDefaultStylesForSongs(lovedSurahs);
@@ -412,7 +412,6 @@ function playMusic(item) {
     });
   }
   item.style.border = "2px solid #36e2ec";
-  songProgressBar.style.width = `0`;
   if (item.classList.contains("loved")) {
     loveThisSong("yes");
   } else {
@@ -467,7 +466,13 @@ function moveProgressBarWhenClicking(e, bar) {
   bar.style.width = `${clickedPosition}px`;
   document.documentElement.style.setProperty("--moveFromLeft", "100%");
 }
-
+function moveProgressBarWithAudio(audio) {
+  let aud_dur = audio.duration / 100;
+  let aud_curr = audio.currentTime;
+  let dis = parseInt(aud_curr / aud_dur);
+  songProgressBar.style.width = `${dis}%`;
+  document.documentElement.style.setProperty("--moveFromLeft", "100%");
+}
 // ============================== Music And Quran Audio  ==============================
 music.addEventListener("playing", () => {
   audioPlayingNow = "local";
@@ -486,7 +491,11 @@ quranAudio.addEventListener("playing", () => {
   document.querySelector(".pause-icon").style.opacity = "1";
   downloadIcon.href = quranAudio.src;
   downloadIcon.setAttribute("download", "");
-  avalibleSongs.forEach((item) => (item.style.border = "none"));
+  searchBox.value = "";
+  resultBox.innerHTML = "";
+  setDefaultStylesForSongs(avalibleSongs);
+  setDefaultStylesForSongs(lovedSurahs);
+  setDefaultStylesForSongs(searchedSongs);
   if (document.querySelector(".icon-bx p"))
     document.querySelector(".icon-bx p").remove();
 });
@@ -515,6 +524,7 @@ function setDefaultStylesForSongs(arr) {
 function setStartAndEndTime(audio) {
   songEndingTime.innerText = setHoursAndMiuntesAndSeconds(audio.duration);
   audio.addEventListener("timeupdate", () => {
+    moveProgressBarWithAudio(audio);
     songStartingTime.innerText = setHoursAndMiuntesAndSeconds(
       audio.currentTime
     );
@@ -600,11 +610,10 @@ function afterEnding(aud) {
   if (mood === "next_song") {
     nextIcon.click();
   } else if (mood === "repeat_song") {
-    songProgressBar.style.width = '0'
     aud.play();
   } else {
     switch (audioPlayingNow) {
-      case 'api':
+      case "api":
         let randomSurahIndex = Math.floor(Math.random() * 114 + 1);
         quranAudio.src = quranAudio.src.replace(
           /\d+.mp3/g,
@@ -612,7 +621,10 @@ function afterEnding(aud) {
         );
         surahs_btn.innerText = surahsNames[randomSurahIndex - 1];
         quranAudio.play();
-        pause_icon.classList.replace("bi-play-circle-fill", "bi-pause-circle-fill");
+        pause_icon.classList.replace(
+          "bi-play-circle-fill",
+          "bi-pause-circle-fill"
+        );
         break;
 
       default:
@@ -636,6 +648,7 @@ function afterEnding(aud) {
   }
 }
 music.addEventListener("ended", () => {
+  songProgressBar.style.width = `0`;
   afterEnding(music);
 });
 quranAudio.addEventListener("ended", () => {
