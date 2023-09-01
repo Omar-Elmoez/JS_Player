@@ -253,6 +253,7 @@ function createLovedSurahsElements() {
   lovedSurahs.forEach((item) => {
     item.addEventListener("click", () => {
       setDefaultStylesForSongs(lovedSurahs);
+      setDefaultStylesForSongs(avalibleSongs);
       item.setAttribute(
         "data-name",
         `${item.querySelector("h5").innerText}.mp3`
@@ -286,8 +287,6 @@ function setHoursAndMiuntesAndSeconds(time) {
 
 // ============================== Activate Start Playing Icon ==============================
 startPlayingIcon.addEventListener("click", () => {
-  searchBox.value = "";
-  resultBox.innerHTML = "";
   if (audioPlayingNow === "api") {
     if (!quranAudio.paused) {
       stopWaving();
@@ -312,7 +311,6 @@ startPlayingIcon.addEventListener("click", () => {
       startWaving();
       Array.from(document.querySelectorAll(".player__item")).forEach((item) => {
         if (item.dataset.name === current) {
-          item.style.border = "2px solid #36e2ec";
           item
             .querySelector(".play-icon")
             .classList.replace("bi-play-circle-fill", "bi-pause-circle-fill");
@@ -369,7 +367,7 @@ function nextAndPrevSong(dir) {
   let current_playing_element = Array.from(
     document.querySelectorAll(".player__item")
   ).filter(
-    (item) => getComputedStyle(item).borderColor === "rgb(54, 226, 236)"
+    (item) => getComputedStyle(item).borderColor === "rgb(54, 226, 236)" || item.querySelector('i').classList.contains('bi-pause-circle-fill')
   )[0];
   let current_playing_index, coming_playing_index;
   if (current_playing_element.classList.contains("loved-song")) {
@@ -401,6 +399,8 @@ function nextAndPrevSong(dir) {
 
 // ============================== Activate Playing Music ==============================
 function playMusic(item) {
+  // searchBox.value = "";
+  // resultBox.innerHTML = "";
   quranAudio.pause();
   pause_icon.classList.replace("bi-pause-circle-fill", "bi-play-circle-fill");
   if (searchBox.value !== "") {
@@ -512,12 +512,14 @@ setMasterPlayInfo(current);
 
 // ============================== Default Setting  ==============================
 function setDefaultStylesForSongs(arr) {
-  arr.forEach((item) => {
-    item.style.border = "none";
-    item
-      .querySelector(".play-icon")
-      .classList.replace("bi-pause-circle-fill", "bi-play-circle-fill");
-  });
+  if (arr.length !== 0) {
+    arr.forEach((item) => {
+      item.style.border = "none";
+      item
+        .querySelector(".play-icon")
+        .classList.replace("bi-pause-circle-fill", "bi-play-circle-fill");
+    });
+  }
 }
 
 // ============================== Activate Timing ==============================
@@ -687,7 +689,8 @@ searchBox.addEventListener("keyup", (e) => {
     searchedSongs = Array.from(document.querySelectorAll(".searched-song"));
     searchedSongs.forEach((item) => {
       item.addEventListener("click", () => {
-        avalibleSongs.forEach((item) => (item.style.border = "none"));
+        setDefaultStylesForSongs(avalibleSongs);
+        if (lovedSurahs) setDefaultStylesForSongs(lovedSurahs);
         playMusic(item);
       });
     });
