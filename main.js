@@ -41,6 +41,8 @@ let surahs_bx = document.querySelector(".surahs-options");
 let surahsList = [];
 let starting_btn = document.getElementById("api-btn");
 let pause_icon = document.querySelector(".pause-icon");
+let searchBox = document.getElementById("search-box");
+let resultBox = document.querySelector(".player__search-results");
 const surahsNames = [
   "Al-Fateha",
   "Al-Bakara",
@@ -171,10 +173,11 @@ avalibleSongs.forEach((item) => {
 });
 // ============================== set Data Names And Durations ==============================
 function setDataNamesAndDurations() {
+  let relatedAudio = new Audio();
   avalibleSongs.forEach((item) => {
     let item_id = item.querySelector("h5").innerText;
     item.setAttribute("data-name", `${item_id}.mp3`);
-    let relatedAudio = new Audio(`audio/${item.dataset.name}`);
+    relatedAudio.src = `audio/${item.dataset.name}`;
     relatedAudio.addEventListener("durationchange", () => {
       item.setAttribute("data-duration", relatedAudio.duration);
       item.querySelector(".subtitle").innerText = setHoursAndMiuntesAndSeconds(
@@ -290,8 +293,17 @@ startPlayingIcon.addEventListener("click", () => {
       stopWaving();
       quranAudio.pause();
       startPlayingIcon.classList.replace("bi-pause-fill", "bi-play-fill");
+      pause_icon.classList.replace(
+        "bi-pause-circle-fill",
+        "bi-play-circle-fill"
+      );
     } else {
       quranAudio.play();
+      startPlayingIcon.classList.replace("bi-play-fill", "bi-pause-fill");
+      pause_icon.classList.replace(
+        "bi-play-circle-fill",
+        "bi-pause-circle-fill"
+      );
     }
   } else {
     if (music.paused || music.currentTime === 0) {
@@ -324,10 +336,33 @@ startPlayingIcon.addEventListener("click", () => {
 
 // ============================== Next & Prev ==============================
 backIcon.addEventListener("click", () => {
-  if (audioPlayingNow === "local") nextAndPrevSong("prev");
+  // if (audioPlayingNow === "local") nextAndPrevSong("prev");
+  if (audioPlayingNow === "local") {
+    nextAndPrevSong("prev");
+  } else {
+    let current_api_index = parseInt(quranAudio.src.match(/\d+.mp3/g)[0]);
+    quranAudio.src = quranAudio.src.replace(
+      /\d+.mp3/g,
+      `${current_api_index - 1}.mp3`
+    );
+    surahs_btn.innerText = surahsNames[current_api_index - 2];
+    quranAudio.play();
+    pause_icon.classList.replace("bi-play-circle-fill", "bi-pause-circle-fill");
+  }
 });
 nextIcon.addEventListener("click", () => {
-  if (audioPlayingNow === "local") nextAndPrevSong("next");
+  if (audioPlayingNow === "local") {
+    nextAndPrevSong("next");
+  } else {
+    let current_api_index = parseInt(quranAudio.src.match(/\d+.mp3/g)[0]);
+    quranAudio.src = quranAudio.src.replace(
+      /\d+.mp3/g,
+      `${current_api_index + 1}.mp3`
+    );
+    surahs_btn.innerText = surahsNames[current_api_index];
+    quranAudio.play();
+    pause_icon.classList.replace("bi-play-circle-fill", "bi-pause-circle-fill");
+  }
 });
 function nextAndPrevSong(dir) {
   let arr;
@@ -363,27 +398,7 @@ function nextAndPrevSong(dir) {
     playMusic(arr[coming_playing_index]);
   }
 }
-function activateNextAndPrevOrNot() {
-  const iconsArr = [
-    document.querySelector(".back-icon"),
-    document.querySelector(".next-icon"),
-  ];
-  if (audioPlayingNow === "api") {
-    iconsArr.forEach((icon) => {
-      icon.style.cssText = `
-        color: #808080;
-        cursor: not-allowed;
-      `;
-    });
-  } else {
-    iconsArr.forEach((icon) => {
-      icon.style.cssText = `
-        color: #fff;
-        cursor: pointer;
-      `;
-    });
-  }
-}
+
 // ============================== Activate Playing Music ==============================
 function playMusic(item) {
   quranAudio.pause();
@@ -458,7 +473,6 @@ music.addEventListener("playing", () => {
   audioPlayingNow = "local";
   setStartAndEndTime(music);
   updateAudio(music);
-  activateNextAndPrevOrNot();
 });
 quranAudio.addEventListener("playing", () => {
   audioPlayingNow = "api";
@@ -468,10 +482,11 @@ quranAudio.addEventListener("playing", () => {
   masterPlayHeading.innerText = surahs_btn.innerText;
   mainHeading.innerText = surahs_btn.innerText;
   startWaving();
-  activateNextAndPrevOrNot();
   document.querySelector(".loading-icon").style.opacity = "0";
   document.querySelector(".pause-icon").style.opacity = "1";
-  avalibleSongs.forEach(item => item.style.border = 'none')
+  downloadIcon.href = quranAudio.src;
+  downloadIcon.setAttribute("download", "");
+  avalibleSongs.forEach((item) => (item.style.border = "none"));
   if (document.querySelector(".icon-bx p"))
     document.querySelector(".icon-bx p").remove();
 });
@@ -581,33 +596,54 @@ moodIcon.addEventListener("click", () => {
       moodIcon.classList.replace("bi-shuffle", "bi-music-note-beamed");
   }
 });
-music.addEventListener("ended", () => {
+function afterEnding(aud) {
   if (mood === "next_song") {
     nextIcon.click();
   } else if (mood === "repeat_song") {
-    music.play();
+    songProgressBar.style.width = '0'
+    aud.play();
   } else {
-    let randomNum = Math.floor(Math.random() * 30);
-    current = allSongsNames[randomNum] + ".mp3";
-    music.src = `audio/${current}`;
-    music.play();
-    setMasterPlayInfo(current);
-    setDefaultStylesForSongs(avalibleSongs);
-    setDownloadInfo();
-    avalibleSongs.forEach((item) => {
-      if (item.dataset.name === current) {
-        item.style.border = "2px solid #36e2ec";
-        item
-          .querySelector(".play-icon")
-          .classList.replace("bi-play-circle-fill", "bi-pause-circle-fill");
-      }
-    });
+    switch (audioPlayingNow) {
+      case 'api':
+        let randomSurahIndex = Math.floor(Math.random() * 114 + 1);
+        quranAudio.src = quranAudio.src.replace(
+          /\d+.mp3/g,
+          `${randomSurahIndex}.mp3`
+        );
+        surahs_btn.innerText = surahsNames[randomSurahIndex - 1];
+        quranAudio.play();
+        pause_icon.classList.replace("bi-play-circle-fill", "bi-pause-circle-fill");
+        break;
+
+      default:
+        let randomNum = Math.floor(Math.random() * 30);
+        current = allSongsNames[randomNum] + ".mp3";
+        music.src = `audio/${current}`;
+        music.play();
+        setMasterPlayInfo(current);
+        setDefaultStylesForSongs(avalibleSongs);
+        setDownloadInfo();
+        avalibleSongs.forEach((item) => {
+          if (item.dataset.name === current) {
+            item.style.border = "2px solid #36e2ec";
+            item
+              .querySelector(".play-icon")
+              .classList.replace("bi-play-circle-fill", "bi-pause-circle-fill");
+          }
+        });
+        break;
+    }
   }
+}
+music.addEventListener("ended", () => {
+  afterEnding(music);
+});
+quranAudio.addEventListener("ended", () => {
+  songProgressBar.style.width = `0`;
+  afterEnding(quranAudio);
 });
 
 // ============================== Activate Search Box ==============================
-let searchBox = document.getElementById("search-box");
-let resultBox = document.querySelector(".player__search-results");
 
 // with event (change) it executes after hitting -Enter-
 // when writing a capital letter using (shift + letter) this means to events so the code below will trigger twice
@@ -729,8 +765,6 @@ surahs_btn.addEventListener("click", (e) => {
         surahIndex = index + 1;
         surahs_bx.classList.remove("active");
         quranAudio.src = `https://cdn.islamic.network/quran/audio-surah/128/${reciterName}/${surahIndex}.mp3`;
-        downloadIcon.href = quranAudio.src;
-        downloadIcon.setAttribute("download", "");
         document.querySelector(".loading-icon").style.opacity = "1";
         document.querySelector(".pause-icon").style.opacity = "0";
         pause_icon.classList.replace(
@@ -750,9 +784,11 @@ quranAudio.addEventListener("error", () => {
 pause_icon.addEventListener("click", () => {
   if (pause_icon.classList.contains("bi-pause-circle-fill")) {
     pause_icon.classList.replace("bi-pause-circle-fill", "bi-play-circle-fill");
+    startPlayingIcon.classList.replace("bi-pause-fill", "bi-play-fill");
     quranAudio.pause();
   } else {
     pause_icon.classList.replace("bi-play-circle-fill", "bi-pause-circle-fill");
+    startPlayingIcon.classList.replace("bi-play-fill", "bi-pause-fill");
     quranAudio.play();
   }
 });
