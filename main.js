@@ -44,6 +44,7 @@ let starting_btn = document.getElementById("api-btn");
 let pause_icon = document.querySelector(".pause-icon");
 let searchBox = document.getElementById("search-box");
 let resultBox = document.querySelector(".player__search-results");
+let error_msg;
 const surahsNames = [
   "Al-Fateha",
   "Al-Bakara",
@@ -193,7 +194,6 @@ playListItems.forEach((item) => {
     playListItems.forEach((ele) => ele.classList.remove("active"));
     item.classList.add("active");
     if (item.innerText === "Loved Surahs") {
-      setDefaultStylesForSongs(avalibleSongs);
       createLovedSurahsElements();
     } else {
       showAllSurahs();
@@ -399,8 +399,6 @@ function nextAndPrevSong(dir) {
 
 // ============================== Activate Playing Music ==============================
 function playMusic(item) {
-  // searchBox.value = "";
-  // resultBox.innerHTML = "";
   quranAudio.pause();
   pause_icon.classList.replace("bi-pause-circle-fill", "bi-play-circle-fill");
   if (searchBox.value !== "") {
@@ -488,14 +486,25 @@ quranAudio.addEventListener("playing", () => {
   mainHeading.innerText = surahs_btn.innerText;
   startWaving();
   document.querySelector(".loading-icon").style.opacity = "0";
-  document.querySelector(".pause-icon").style.opacity = "1";
+  pause_icon.style.opacity = "1";
+  pause_icon.addEventListener("click", () => {
+    if (pause_icon.classList.contains("bi-pause-circle-fill")) {
+      pause_icon.classList.replace("bi-pause-circle-fill", "bi-play-circle-fill");
+      startPlayingIcon.classList.replace("bi-pause-fill", "bi-play-fill");
+      quranAudio.pause();
+    } else {
+      pause_icon.classList.replace("bi-play-circle-fill", "bi-pause-circle-fill");
+      startPlayingIcon.classList.replace("bi-play-fill", "bi-pause-fill");
+      quranAudio.play();
+    }
+  });
   downloadIcon.href = quranAudio.src;
   downloadIcon.setAttribute("download", "");
   searchBox.value = "";
   resultBox.innerHTML = "";
-  setDefaultStylesForSongs(avalibleSongs);
-  setDefaultStylesForSongs(lovedSurahs);
-  setDefaultStylesForSongs(searchedSongs);
+  if (avalibleSongs) setDefaultStylesForSongs(avalibleSongs);
+  if (lovedSurahs) setDefaultStylesForSongs(lovedSurahs);
+  if (searchedSongs) setDefaultStylesForSongs(searchedSongs);
   if (document.querySelector(".icon-bx p"))
     document.querySelector(".icon-bx p").remove();
 });
@@ -782,7 +791,7 @@ surahs_btn.addEventListener("click", (e) => {
         surahs_bx.classList.remove("active");
         quranAudio.src = `https://cdn.islamic.network/quran/audio-surah/128/${reciterName}/${surahIndex}.mp3`;
         document.querySelector(".loading-icon").style.opacity = "1";
-        document.querySelector(".pause-icon").style.opacity = "0";
+        pause_icon.style.opacity = "0";
         pause_icon.classList.replace(
           "bi-play-circle-fill",
           "bi-pause-circle-fill"
@@ -794,19 +803,12 @@ surahs_btn.addEventListener("click", (e) => {
 });
 quranAudio.addEventListener("error", () => {
   document.querySelector(".loading-icon").style.opacity = "0";
-  let msg = `<p>Sorry, Not Avalible For This Reciter</p>`;
-  document.querySelector(".icon-bx").innerHTML += msg;
-});
-pause_icon.addEventListener("click", () => {
-  if (pause_icon.classList.contains("bi-pause-circle-fill")) {
-    pause_icon.classList.replace("bi-pause-circle-fill", "bi-play-circle-fill");
-    startPlayingIcon.classList.replace("bi-pause-fill", "bi-play-fill");
-    quranAudio.pause();
-  } else {
-    pause_icon.classList.replace("bi-play-circle-fill", "bi-pause-circle-fill");
-    startPlayingIcon.classList.replace("bi-play-fill", "bi-pause-fill");
-    quranAudio.play();
-  }
+  document.querySelector(".pause-icon").style.opacity = "0";
+  startPlayingIcon.classList.replace("bi-pause-fill", "bi-play-fill");
+  error_msg = `<p>Sorry, Not Avalible For This Reciter</p>`;
+  if (!document.querySelector(".icon-bx p")) document.querySelector(".icon-bx").innerHTML += error_msg;
+  masterPlayHeading.innerText = 'Not Available';
+  mainHeading.innerText = 'Not Available';
 });
 async function fetchdata() {
   let responde = await fetch(
