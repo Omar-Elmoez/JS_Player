@@ -471,7 +471,7 @@ function moveProgressBarWithAudio(audio) {
   songProgressBar.style.width = `${dis}%`;
   document.documentElement.style.setProperty("--moveFromLeft", "100%");
 }
-// ============================== Music And Quran Audio  ==============================
+// ============================== Music And Quran Audio Playing  ==============================
 music.addEventListener("playing", () => {
   audioPlayingNow = "local";
   setStartAndEndTime(music);
@@ -487,17 +487,6 @@ quranAudio.addEventListener("playing", () => {
   startWaving();
   document.querySelector(".loading-icon").style.opacity = "0";
   pause_icon.style.opacity = "1";
-  pause_icon.addEventListener("click", () => {
-    if (pause_icon.classList.contains("bi-pause-circle-fill")) {
-      pause_icon.classList.replace("bi-pause-circle-fill", "bi-play-circle-fill");
-      startPlayingIcon.classList.replace("bi-pause-fill", "bi-play-fill");
-      quranAudio.pause();
-    } else {
-      pause_icon.classList.replace("bi-play-circle-fill", "bi-pause-circle-fill");
-      startPlayingIcon.classList.replace("bi-play-fill", "bi-pause-fill");
-      quranAudio.play();
-    }
-  });
   downloadIcon.href = quranAudio.src;
   downloadIcon.setAttribute("download", "");
   searchBox.value = "";
@@ -617,6 +606,8 @@ moodIcon.addEventListener("click", () => {
       moodIcon.classList.replace("bi-shuffle", "bi-music-note-beamed");
   }
 });
+
+// ============================== Music And Quran Audio Ending  ==============================
 function afterEnding(aud) {
   if (mood === "next_song") {
     nextIcon.click();
@@ -799,6 +790,17 @@ surahs_btn.addEventListener("click", (e) => {
         quranAudio.play();
       });
     });
+  }
+});
+pause_icon.addEventListener("click", () => {
+  if (pause_icon.classList.contains("bi-pause-circle-fill")) {
+    pause_icon.classList.replace("bi-pause-circle-fill", "bi-play-circle-fill");
+    startPlayingIcon.classList.replace("bi-pause-fill", "bi-play-fill");
+    quranAudio.pause();
+  } else {
+    pause_icon.classList.replace("bi-play-circle-fill", "bi-pause-circle-fill");
+    startPlayingIcon.classList.replace("bi-play-fill", "bi-pause-fill");
+    quranAudio.play();
   }
 });
 quranAudio.addEventListener("error", () => {
